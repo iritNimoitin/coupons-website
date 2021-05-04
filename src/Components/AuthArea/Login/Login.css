@@ -1,0 +1,14 @@
+
+.Login {
+	margin: 20px;
+    padding: 20px;
+}
+
+.Login > .Headline {
+    text-align: center;
+}
+
+.TextBox {
+    width: 450px;
+    margin: 5px imp !important;
+}

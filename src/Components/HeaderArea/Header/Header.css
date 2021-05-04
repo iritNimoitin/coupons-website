@@ -1,0 +1,10 @@
+.Header {
+	display: flex;
+}
+
+.Header > span {
+    flex-direction: row-reverse;
+}
+span{
+    display: flex;
+}
