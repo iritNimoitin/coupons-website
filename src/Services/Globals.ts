@@ -27,9 +27,11 @@ class DevelopmentGlobals extends Globals {
             couponsByMaxPrice: "http://localhost:8080/api/Customer/max-price/",
             couponsByCategory: "http://localhost:8080/api/Customer/coupons/category/"
         },
-        coupons: "http://localhost:8080/App/coupons/",
-        // register: "http://localhost:3030/api/auth/register/",
-        login: "http://localhost:8080/api/Auth/login/"
+        auth: {
+            register: "http://localhost:8080/api/Auth/register/",
+            login: "http://localhost:8080/api/Auth/login/"
+        },
+        coupons: "http://localhost:8080/App/coupons/"
     };
 
 }
@@ -57,9 +59,11 @@ class productionGlobal extends Globals{
             couponsByMaxPrice: "http://localhost:8080/api/Customer/max-price/",
             couponsByCategory: "http://localhost:8080/api/Customer/coupons/category/"
         },
-        coupons: "http://localhost:8080/App/coupons/",
-        // register: "http://localhost:3030/api/auth/register/",
-        login: "http://localhost:8080/api/Auth/login/"
+        auth: {
+            register: "http://localhost:8080/api/Auth/register/",
+            login: "http://localhost:8080/api/Auth/login/"
+        },
+        coupons: "http://localhost:8080/App/coupons/"
     };
 }
 const globals = process.env.NODE_ENV === "development" ? new DevelopmentGlobals() : new productionGlobal();

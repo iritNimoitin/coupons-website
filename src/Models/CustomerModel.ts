@@ -7,6 +7,7 @@ class CustomerModel {
     public email: string;
     public password: string;
     public coupons: CouponModel[];
+    public token: string;
 }
 
 export default CustomerModel;

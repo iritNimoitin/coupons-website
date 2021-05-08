@@ -1,6 +1,8 @@
 
 import { Redirect, Route, Switch } from "react-router";
 import Login from "../AuthArea/Login/Login";
+import Logout from "../AuthArea/Logout/Logout";
+import Register from "../AuthArea/Register/Register";
 import CouponDetails from "../CouponsArea/CouponDetails/CouponDetails";
 import CouponsList from "../CouponsArea/CouponsList/CouponsList";
 import Home from "../HomeArea/Home/Home";
@@ -15,6 +17,8 @@ function Routing(): JSX.Element {
             <Route path="/coupons/:category" component={CouponsList} exact />
             <Route path="/coupons/:category/:id" component={CouponDetails} exact />
             <Route path="/login" component={Login} exact />
+            <Route path ="/logout" component={Logout} exact />
+            <Route path ="/register" component={Register} exact />
             {/* <Route path="/coupons/Electricity" component={CouponsList} exact />
             <Route path="/coupons/Spa" component={CouponsList} exact />
             <Route path="/coupons/Restaurant" component={CouponsList} exact />

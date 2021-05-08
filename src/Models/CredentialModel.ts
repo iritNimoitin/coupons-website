@@ -5,6 +5,6 @@ import CustomerModel from "./CustomerModel";
 class CredentialModel{
     public email:string;
     public password: string;
-    public clientType?: CompanyModel | CustomerModel | AdminModel;
+    public clientType: "Company" | "Customer" | "Admin";
 }
 export default CredentialModel;
