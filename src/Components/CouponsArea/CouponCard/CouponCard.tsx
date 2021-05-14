@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -16,9 +16,12 @@ import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import CouponModel from '../../../Models/CouponModel';
-import LogoImage from "../../../Assests/Images/Coupons_logo.png"
+import LogoImage from "../../../Assests/Images/Coupons_logo.png";
 import { Chip } from '@material-ui/core';
 import { NavLink } from 'react-router-dom';
+import globals from '../../../Services/Globals';
+import axios from 'axios';
+import notify from '../../../Services/Notification';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -52,10 +55,31 @@ interface CouponCardProps {
 export default function CouponCard(props: CouponCardProps) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const [image, setImage] = React.useState();
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  useEffect(() => {
+    getImageFromServer();
+  }, []);
+
+  async function getImageFromServer() {
+    try{
+        const headers = {
+            'id': props.coupon.id,
+            'category': props.coupon.category
+        }
+        //get products from the server:
+        const response = await axios.get(globals.urls.images, {headers});
+        console.log(props.coupon.id);
+        //update local state:
+        setImage(response.data[0]);
+    }catch (err) {
+        // notify.error(err);
+    }
+  }
 
   return (
     <Card className={classes.root} square={false} variant="outlined">
@@ -68,9 +92,10 @@ export default function CouponCard(props: CouponCardProps) {
       />
       <NavLink to= {"/coupons/" + props.coupon.category + "/" + props.coupon.id}> 
         <CardMedia
-            className={classes.media}
-            image={LogoImage}
-            title="Logo Image"
+          id={props.coupon.id.toString()}
+          className={classes.media}
+          title={props.coupon.title}
+          image={image}
         />
       </NavLink>
       <CardContent>

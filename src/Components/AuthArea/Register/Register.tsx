@@ -28,12 +28,14 @@ import LockOpenIcon from '@material-ui/icons/LockOpen';
 import "./Register.css";
 import CompanyModel from "../../../Models/CompanyModel";
 import CustomerModel from "../../../Models/CustomerModel";
+import jwtAxios from "../../../Services/jwtAxios";
+import getUserFromToken from "../../../Services/Utilities";
 
 interface State {
     password: string;
     showPassword: boolean;
     clientType: string;
-  }
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -91,11 +93,9 @@ function Register(): JSX.Element {
                     'name': (user as CompanyModel).name
                 }
             }
-            console.log(user);
-            console.log(headers);
-            const response = await axios.post(url, {headers});
-            console.log(response.data);
-            store.dispatch(registerAction(response.data));
+            const response = await jwtAxios.post(url, null, {headers});
+            const client = getUserFromToken(response.data, values.clientType);
+            store.dispatch(registerAction((client as CustomerModel | CompanyModel)));
             notify.success("you have been successfully registered!");
             history.push("/home"); //redirect to home on success
         }

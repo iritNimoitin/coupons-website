@@ -28,9 +28,10 @@ class DevelopmentGlobals extends Globals {
             couponsByCategory: "http://localhost:8080/api/Customer/coupons/category/"
         },
         auth: {
-            register: "http://localhost:8080/api/Auth/register/",
-            login: "http://localhost:8080/api/Auth/login/"
+            register: "http://localhost:8080/Auth/register/",
+            login: "http://localhost:8080/Auth/login/"
         },
+        images: "http://localhost:8080/App/coupons/images/",
         coupons: "http://localhost:8080/App/coupons/"
     };
 
@@ -60,9 +61,10 @@ class productionGlobal extends Globals{
             couponsByCategory: "http://localhost:8080/api/Customer/coupons/category/"
         },
         auth: {
-            register: "http://localhost:8080/api/Auth/register/",
-            login: "http://localhost:8080/api/Auth/login/"
+            register: "http://localhost:8080/Auth/register/",
+            login: "http://localhost:8080/Auth/login/"
         },
+        images: "http://localhost:8080/App/coupons/images/",
         coupons: "http://localhost:8080/App/coupons/"
     };
 }

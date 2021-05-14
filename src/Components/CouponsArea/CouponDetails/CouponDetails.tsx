@@ -4,8 +4,15 @@ import { NavLink } from "react-router-dom";
 import "./CouponDetails.css";
 import CouponModel from "../../../Models/CouponModel";
 import LogoImage from "../../../Assests/Images/Coupons_logo.png"
-import { getCategory } from "../../../Redux/Stores";
+import store, { getCategory } from "../../../Redux/Stores";
+import Button from '@material-ui/core/Button';
 import notify from "../../../Services/Notification";
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import ShoppingCartOutlinedIcon from '@material-ui/icons/ShoppingCartOutlined';
+import Purchase from "../../CustomerArea/Purchase/Purchase";
+import axios from "axios";
+import globals from "../../../Services/Globals";
+import jwtAxios from "../../../Services/jwtAxios";
 
 interface RouteParam{
    id: string;
@@ -40,9 +47,29 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
             notify.error(err);
         }
     }
+    
+
+    public handlePurchase = () => {
+        this.purchaseCoupon();
+    }
+
+    private async purchaseCoupon() {
+        try {
+          const headers = {
+            'token': store.getState().AuthState.user.token,
+            'couponId': this.state.coupon.id
+          }
+          await jwtAxios.put(globals.urls.customer.coupons, null, {headers});
+          notify.success("You have been successfully purchasing the coupon.");
+        }
+        catch(err) {
+          notify.error(err);
+        }
+    }
 
     public render(): JSX.Element {
         
+
         return (
             <div className="CouponDetails">
                 {this.state.coupon && 
@@ -51,8 +78,18 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
                         <h3>Title: {this.state.coupon.title}</h3>
                         <h3>Price: {this.state.coupon.price}</h3>
                         <h3>Amount: {this.state.coupon.amount}</h3>
+                        <h3>Description: {this.state.coupon.description}</h3>
                         <img src={LogoImage}/>
                         {/* <img src={globals.urls.couponImages + this.state.coupon.imageName}/> */}
+                        {store.getState().AuthState.user != null && <Button
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            startIcon={<ShoppingCartOutlinedIcon />}
+                            onClick={this.handlePurchase}
+                        >
+                            Buy Now
+                        </Button>}
                         <br /> <br />
                         <NavLink to ="/coupons">Back</NavLink>
                     </>

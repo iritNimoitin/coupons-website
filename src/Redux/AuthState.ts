@@ -1,12 +1,14 @@
-import UserModel from "../Models/UserModel";
+import AdminModel from "../Models/AdminModel";
+import CompanyModel from "../Models/CompanyModel";
+import CustomerModel from "../Models/CustomerModel";
 
 export class AuthState{
-    public user: UserModel = null;
+    public user: CustomerModel | CompanyModel | AdminModel = null;
     public constructor (){
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if(storedUser){
-          this.user = storedUser;
-      }
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if(storedUser){
+            this.user = storedUser;
+        }
     }
 }
 //--------------------------------------------------------
@@ -20,14 +22,14 @@ export enum AuthActionType {
 //Auth Action:
 export interface AuthAction {
     type: AuthActionType;
-    payload? : any;
+    payload?: any;
 }
 //-------------------------------------------------------
 //action creators 
-export function registerAction(user: UserModel): AuthAction{
+export function registerAction(user: CustomerModel | CompanyModel): AuthAction{
     return { type: AuthActionType.Register, payload: user };
 }
-export function loginAction(user: UserModel): AuthAction{
+export function loginAction(user: CustomerModel | CompanyModel | AdminModel): AuthAction{
     return { type: AuthActionType.Login, payload: user };
 }
 export function logoutAction(): AuthAction{

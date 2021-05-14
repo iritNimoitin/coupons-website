@@ -46,8 +46,9 @@ export default function HideAppBar(props: Props) {
                   {props.children}
               </header>
               <Logo/>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <SearchAppBar/>
-                <Menu/>
+              <Menu/>
             </Toolbar>
           </AppBar>
         </HideOnScroll>

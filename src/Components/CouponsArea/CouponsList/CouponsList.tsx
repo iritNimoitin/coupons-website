@@ -67,7 +67,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
                 url = url + "category/";
             }
             //get products from the server:
-            const response = await axios.get(url, {headers});
+            const response = await axios.get(url, {headers});//jwtAxios ?????
             //update app state:
             store.dispatch(couponsDownloadedAction(response.data.content, category));
             //update local state:

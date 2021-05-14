@@ -20,6 +20,14 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import "./Login.css";
+import jwtAxios from "../../../Services/jwtAxios";
+import jwtDecode, { JwtPayload } from "jwt-decode";
+import CustomerModel from "../../../Models/CustomerModel";
+import CompanyModel from "../../../Models/CompanyModel";
+import AdminModel from "../../../Models/AdminModel";
+import userEvent from "@testing-library/user-event";
+import Utilities from "../../../Services/Utilities";
+import getUserFromToken from "../../../Services/Utilities";
 
 interface State {
     password: string;
@@ -70,8 +78,10 @@ function Login(): JSX.Element {
             'password': credentials.password,
             'clientType': credentials.clientType,
           }
-          const response = await axios.post(globals.urls.auth.login, {headers});
-          store.dispatch(loginAction(response.data));
+          const response = await jwtAxios.post(globals.urls.auth.login, null, {headers});
+
+          const client = getUserFromToken(response.data, credentials.clientType);
+          store.dispatch(loginAction(client));
           notify.success("You have been successfully logged in!");
           history.push("/home"); // Redirect to home on success
         }
@@ -88,17 +98,18 @@ function Login(): JSX.Element {
       });
     };
 
-    const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValues({ ...values, [prop]: event.target.value });
-      };
+    const handleChange = (event: any) => {
+      //setValues({ ...values, [prop]: event.target.value });
+      setValues({ ...values, password: event.target.value });
+    };
 
     const handleClickShowPassword = () => {
-        setValues({ ...values, showPassword: !values.showPassword });
-      };
+      setValues({ ...values, showPassword: !values.showPassword });
+    };
     
-      const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-      };
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+    };
 
     return (
         <div className="Login Box">
@@ -116,7 +127,7 @@ function Login(): JSX.Element {
                     <br />
 
                     {/* <TextField label="password" variant="outlined" className="TextBox" ref={register}/> */}
-                    <FormControl className={clsx(classes.margin, classes.textField)}  variant="outlined"> 
+                    {/* <FormControl className={clsx(classes.margin, classes.textField)}  variant="outlined">  */}
                         <TextField
                             name="password"
                             variant="outlined"
@@ -124,7 +135,7 @@ function Login(): JSX.Element {
                             id="outlined-adornment-password"
                             type={values.showPassword ? 'text' : 'password'}
                             value={values.password}
-                            onChange={handleChange('password')}
+                            onChange={handleChange}
                             InputProps={{endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton
@@ -141,7 +152,7 @@ function Login(): JSX.Element {
                                 required: { value: true, message: "Missing Password." }
                             })}
                         />
-                    </FormControl>
+                    {/* </FormControl> */}
                     <br />
 
                     <FormControl variant="outlined" className={classes.formControl}>
