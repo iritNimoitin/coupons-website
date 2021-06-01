@@ -10,16 +10,16 @@ import CouponCard from "../CouponCard/CouponCard";
 import { RouteComponentProps, withRouter } from "react-router";
 import PagesToggle from "../PagesToggle/PagesToggle";
 
-interface RouteParam{
+interface RouteParam {
     category: string;
 }
 
-interface CouponListProps extends RouteComponentProps<RouteParam>{
-    
+interface CouponListProps extends RouteComponentProps<RouteParam> {
+
 }
 
 interface CouponsListState {
-	coupons: CouponModel[];
+    coupons: CouponModel[];
     category: string;
     page: number;
     numOfPages: number;
@@ -43,19 +43,25 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
         this.getCoupons();
     }
 
-    private getCoupons(){
-        //only if we dont have our products in the app state - get them from the server :
-        if (getCategory(this.state.category).length === 0){
+    private getCoupons() {
+        const category = this.props.match.params.category || "";
+        const index = this.state.page * 8;
+        if (!getCategory(category).coupons[index]) {
             this.getCouponsFromServer();
         } else {
-            this.setState({ coupons: getCategory(this.state.category) });
+            this.setState({
+                coupons: getCategory(category).coupons.slice(index, index + 8),
+                category: category,
+                numOfPages: getCategory(category).numOfPages,
+                totalElements: getCategory(category).totalElements
+            });
         }
     }
 
     private async getCouponsFromServer() {
-        try{
+        try {
             const category = this.props.match.params.category || "";
-            const itemsPerPage = this.state.page !== this.state.numOfPages-1 ? 4 :  this.state.totalElements-(this.state.page * 4);
+            const itemsPerPage = this.state.page !== this.state.numOfPages - 1 ? 8 : this.state.totalElements - (this.state.page * 8);
             const headers = {
                 'pageNumber': this.state.page,
                 'itemsPerPage': itemsPerPage,
@@ -63,52 +69,49 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
                 'category': category
             }
             let url = globals.urls.coupons;
-            if(category !== ''){
+            if (category !== '') {
                 url = url + "category/";
             }
-            //get products from the server:
-            const response = await axios.get(url, {headers});//jwtAxios ?????
-            //update app state:
-            store.dispatch(couponsDownloadedAction(response.data.content, category));
-            //update local state:
+            const response = await axios.get(url, { headers });
             this.setState({
                 coupons: response.data.content,
                 totalElements: response.data.totalElements
             });
-            if(this.state.page !== this.state.numOfPages-1){
+            let pages = this.state.numOfPages;
+            if (this.state.page !== this.state.numOfPages - 1) {
+                pages = response.data.totalPages;
                 this.setState({
                     numOfPages: response.data.totalPages
                 })
             }
-        }catch (err) {
+            console.log(response.data.content);
+            store.dispatch(couponsDownloadedAction(response.data.content, category, this.state.page * 8, itemsPerPage, pages, response.data.totalElements));
+        } catch (err) {
             notify.error(err);
         }
     }
 
     public handlePageChange = (page: number) => {
-        this.setState({page: page-1})
+        this.setState({ page: page - 1 });
     }
 
     public componentDidUpdate(prevProps: CouponListProps, prevState: CouponsListState) {
-        if(this.state.category !== this.props.match.params.category && this.props.match.params.category !== undefined) {
-            this.setState({
-                category: this.props.match.params.category || '',
-                page: 0,
-                numOfPages: 0
-            });
+        const category = this.props.match.params.category || '';
+        if (prevProps.match.params.category !== category && this.props.match.params.category !== undefined) {
             this.getCoupons();
-        } else if(this.state.page !== prevState.page) {
-            this.getCouponsFromServer();
+        } else if (this.state.page !== prevState.page) {
+            this.getCoupons();
         }
     }
 
     public render(): JSX.Element {
-        return (
+        return (//some coupons came as null!
             <div className="CouponsList">
-                {this.state.category !== '' && <h3>{this.state.category}</h3>}
-				{this.state.coupons.map(c => <CouponCard key={c.id} coupon={c} />)}
-                {this.state.numOfPages > 1 && 
-                <PagesToggle pageNumber={this.state.page+1} numberOfPages={this.state.numOfPages} handlePageChange={this.handlePageChange} />}
+                {this.state.coupons.map(c => c && <CouponCard key={c.id} coupon={c} />)}
+                {this.state.numOfPages >= 1 &&
+                    <PagesToggle pageNumber={this.state.page + 1} numberOfPages={this.state.numOfPages} handlePageChange={this.handlePageChange} />}
+                <br />
+                <br />
             </div>
         );
     }

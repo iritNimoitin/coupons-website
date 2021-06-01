@@ -18,10 +18,16 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import CouponModel from '../../../Models/CouponModel';
 import LogoImage from "../../../Assests/Images/Coupons_logo.png";
 import { Chip } from '@material-ui/core';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import globals from '../../../Services/Globals';
+import Button from '@material-ui/core/Button';
 import axios from 'axios';
 import notify from '../../../Services/Notification';
+import store from '../../../Redux/Stores';
+import CompanyModel from '../../../Models/CompanyModel';
+import UpdateCoupon from '../../CompanyArea/UpdateCoupon/UpdateCoupon';
+import companyService from '../../../Services/CompanyService';
+import { FacebookShareButton, FacebookIcon, WhatsappShareButton, WhatsappIcon } from "react-share";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     media: {
       height: 0,
-      paddingTop: '56.25%', // 16:9
+      paddingTop: '56.25%',
     },
     expand: {
       transform: 'rotate(0deg)',
@@ -49,71 +55,104 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface CouponCardProps {
-	coupon: CouponModel;
+  coupon: CouponModel;
 }
 
 export default function CouponCard(props: CouponCardProps) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const [image, setImage] = React.useState();
+  const [clientType, setClientType] = React.useState<String>(null);
+  const [clientId, setClientId] = React.useState<number>(null);
+
+  const history = useHistory();
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   useEffect(() => {
-    getImageFromServer();
+    setClientType(store.getState().AuthState.clientType);
+    if (store.getState().AuthState.clientType === "Company") {
+      setClientId((store.getState().AuthState.user as CompanyModel).id);
+    }
+    store.subscribe(() => {
+      setClientType(store.getState().AuthState.clientType);
+      if (store.getState().AuthState.clientType === "Company") {
+        setClientId((store.getState().AuthState.user as CompanyModel).id);
+      }
+    });
   }, []);
 
-  async function getImageFromServer() {
-    try{
-        const headers = {
-            'id': props.coupon.id,
-            'category': props.coupon.category
-        }
-        //get products from the server:
-        const response = await axios.get(globals.urls.images, {headers});
-        console.log(props.coupon.id);
-        //update local state:
-        setImage(response.data[0]);
-    }catch (err) {
-        // notify.error(err);
-    }
+  const handleDelete = () => {
+    companyService.deleteCoupon(props.coupon.id);
+  }
+
+  const handleUpdate = () => {
+    let path = `/update/${props.coupon.category}/${props.coupon.id}`;
+    history.push(path);
   }
 
   return (
     <Card className={classes.root} square={false} variant="outlined">
       <CardHeader
         avatar={
-            <Chip variant="outlined" color="primary" label={props.coupon.category} />
+          <Chip variant="outlined" color="primary" label={props.coupon.category} />
         }
         title={props.coupon.title}
-        // subheader= {"$" + props.coupon.price.toString()}
+        subheader={props.coupon.company.name}
       />
-      <NavLink to= {"/coupons/" + props.coupon.category + "/" + props.coupon.id}> 
+      <NavLink to={"/coupons/" + props.coupon.category + "/" + props.coupon.id}>
         <CardMedia
           id={props.coupon.id.toString()}
           className={classes.media}
           title={props.coupon.title}
-          image={image}
+          image={props.coupon.images ? props.coupon.images[0] : ""}
         />
       </NavLink>
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
-            Price: ${props.coupon.price}<br/>
-            Amount: {props.coupon.amount}<br/>
-            {/* Company: {props.coupon.company.name}<br/> */}
-            Start date: {props.coupon.startDate}<br/>
-            End Date: {props.coupon.endDate}<br/>
+          Price: ${props.coupon.price}<br />
+            Amount: {props.coupon.amount}<br />
+            Start date: {props.coupon.startDate}<br />
+            End Date: {props.coupon.endDate}<br />
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon color= "secondary" />
-        </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon color= "primary" />
-        </IconButton>
+        {clientType === "Customer" &&
+          <>
+            <IconButton aria-label="add to favorites">
+              <FavoriteIcon color="secondary" />
+            </IconButton>
+          </>
+        }
+        &nbsp;
+        <FacebookShareButton
+          url={"https://github.com/iritNimoitin"}
+          quote={props.coupon.title}
+          hashtag={"#LuckyCoupons"}
+        >
+          <FacebookIcon size={32} round />
+        </FacebookShareButton>
+          &nbsp;
+          <WhatsappShareButton
+          url={"https://github.com/iritNimoitin"}
+          title={props.coupon.title}
+        >
+          <WhatsappIcon size={32} round />
+        </WhatsappShareButton>
+        &nbsp;&nbsp;
+        {clientId === props.coupon.company.id &&
+          <>
+            <Button variant="contained" color="primary" size="small" onClick={handleUpdate}>
+              Update
+            </Button>
+            &nbsp;
+            <Button variant="contained" color="secondary" size="small" onClick={handleDelete}>
+              Delete
+            </Button>
+          </>
+        }
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,

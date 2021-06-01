@@ -1,97 +1,116 @@
-import { Component, Fragment } from "react";
+import { Component } from "react";
 import { RouteComponentProps } from "react-router";
-import { NavLink } from "react-router-dom";
 import "./CouponDetails.css";
 import CouponModel from "../../../Models/CouponModel";
-import LogoImage from "../../../Assests/Images/Coupons_logo.png"
 import store, { getCategory } from "../../../Redux/Stores";
 import Button from '@material-ui/core/Button';
 import notify from "../../../Services/Notification";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import ShoppingCartOutlinedIcon from '@material-ui/icons/ShoppingCartOutlined';
-import Purchase from "../../CustomerArea/Purchase/Purchase";
-import axios from "axios";
-import globals from "../../../Services/Globals";
-import jwtAxios from "../../../Services/jwtAxios";
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { Carousel } from 'react-responsive-carousel';
+import customerService from "../../../Services/CustomerService";
+import { Typography } from "@material-ui/core";
+import ArrowBackOutlinedIcon from '@material-ui/icons/ArrowBackOutlined';
+import { withRouter } from 'react-router-dom';
 
-interface RouteParam{
-   id: string;
-   category: string;
+interface RouteParam {
+    id: string;
+    category: string;
 }
-interface CouponDetailsProps extends RouteComponentProps<RouteParam>{
-	
+interface CouponDetailsProps extends RouteComponentProps<RouteParam> {
+
 }
 
 interface CouponDetailsState {
-	coupon: CouponModel;
+    coupon: CouponModel;
+    images: string[];
+    clientType: string;
 }
 
 class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
 
     public constructor(props: CouponDetailsProps) {
         super(props);
-        this.state = {coupon:null}; 
+        this.state = {
+            coupon: null,
+            images: [],
+            clientType: null
+        };
     }
 
-    public async componentDidMount() {
+    public componentDidMount() {
         try {
-            const id = +this.props.match.params.id;//the + is for converting string to number 
+            const id = +this.props.match.params.id;
             const category = this.props.match.params.category;
-            let coupon = getCategory("").find(c => c.id === id);
-            if(coupon == undefined){
-                coupon = getCategory(category).find(c => c.id === id);
+            let coupon = getCategory("").coupons.find(c => c.id === id);
+            if (coupon == undefined) {
+                coupon = getCategory(category).coupons.find(c => c.id === id);
             }
-            this.setState({ coupon });
+            const type = store.getState().AuthState.clientType;
+
+            this.setState({
+                coupon: coupon,
+                images: coupon.images,
+                clientType: type
+            });
         }
         catch (err) {
             notify.error(err);
         }
     }
-    
 
     public handlePurchase = () => {
-        this.purchaseCoupon();
+        customerService.purchaseCoupon(this.state.coupon.id);
     }
 
-    private async purchaseCoupon() {
-        try {
-          const headers = {
-            'token': store.getState().AuthState.user.token,
-            'couponId': this.state.coupon.id
-          }
-          await jwtAxios.put(globals.urls.customer.coupons, null, {headers});
-          notify.success("You have been successfully purchasing the coupon.");
-        }
-        catch(err) {
-          notify.error(err);
-        }
+    public handleBack = () => {
+
     }
 
     public render(): JSX.Element {
-        
 
         return (
             <div className="CouponDetails">
-                {this.state.coupon && 
+                {this.state.coupon &&
                     <>
-                        <h2>Coupon Details</h2>
-                        <h3>Title: {this.state.coupon.title}</h3>
+                        <Typography variant="h2" component="h2" gutterBottom>
+                            {this.state.coupon.title}
+                        </Typography>
+
                         <h3>Price: {this.state.coupon.price}</h3>
                         <h3>Amount: {this.state.coupon.amount}</h3>
                         <h3>Description: {this.state.coupon.description}</h3>
-                        <img src={LogoImage}/>
-                        {/* <img src={globals.urls.couponImages + this.state.coupon.imageName}/> */}
-                        {store.getState().AuthState.user != null && <Button
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            startIcon={<ShoppingCartOutlinedIcon />}
-                            onClick={this.handlePurchase}
-                        >
-                            Buy Now
-                        </Button>}
+                        <div id="images">
+                            <Carousel width={600}>
+                                {this.state.images.map(src =>
+                                    <div>
+                                        <img src={src} />
+                                    </div>
+                                )}
+                            </Carousel>
+                        </div>
+                        {store.getState().AuthState.user && this.state.clientType === "Customer" &&
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                startIcon={<ShoppingCartOutlinedIcon />}
+                                onClick={this.handlePurchase}
+                            >
+                                Buy Now
+                            </Button>
+                        }
                         <br /> <br />
-                        <NavLink to ="/coupons">Back</NavLink>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            size="small"
+                            startIcon={<ArrowBackOutlinedIcon />}
+                            onClick={this.props.history.goBack}
+                        >
+                            Back
+                        </Button>
+                        <br /> <br />
                     </>
                 }
             </div>
@@ -99,4 +118,4 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
     }
 }
 
-export default CouponDetails;
+export default withRouter(CouponDetails);

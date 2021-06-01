@@ -1,3 +1,4 @@
+import { CouponCategories } from "../Redux/CouponsState";
 import CouponModel from "./CouponModel";
 
 class CompanyModel {
@@ -5,7 +6,7 @@ class CompanyModel {
     public name: string;
     public email: string;
     public password: string;
-    public coupons: CouponModel[];
+    public coupons: CouponCategories;
     public token: string;
 }
 

@@ -11,7 +11,9 @@ class CouponModel {
     public endDate: Date;
     public amount: number;
     public price: number;
-    public image: FileList;
+    public imageToSend: FileList;
+    public images: string[];
+    public imagesNames: string[];
     public customers: CustomerModel[];
 
 }

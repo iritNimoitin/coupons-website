@@ -1,6 +1,4 @@
 
-//handing product app state
-
 import CouponModel from "../Models/CouponModel";
 
 export interface CouponCategories {
@@ -13,40 +11,85 @@ export interface CouponCategories {
     Furniture: CouponModel[]
 }
 
-//product app state- הבמידע ברמת האפליקציה הקשור למוצרים -אלו בעצם כל המוצרים
+export interface CouponSet {
+    coupons: CouponModel[],
+    numOfPages: number,
+    totalElements: number
+}
+
+interface CouponPageCategories {
+    All: CouponSet,
+    Electricity: CouponSet,
+    Spa: CouponSet,
+    Restaurant: CouponSet,
+    Vacation: CouponSet,
+    Attractions: CouponSet,
+    Furniture: CouponSet
+}
+
 export class CouponsState {
-    public coupons: CouponCategories = {
-        All: [],
-        Electricity: [],
-        Spa: [],
-        Restaurant: [],
-        Vacation: [],
-        Attractions: [],
-        Furniture: []
-    }; //we are going to create initial object
+    public category: CouponPageCategories = {
+        All: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        },
+        Electricity: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        },
+        Spa: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        },
+        Restaurant: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        },
+        Vacation: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        },
+        Attractions: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        },
+        Furniture: {
+            coupons: [],
+            numOfPages: 0,
+            totalElements: 0
+        }
+    };
 }
 //----------------------------------------------------------------------------------
 //product action types:-אלו פעולות ניתן לבצע ברמת האפליקציה
-export enum CouponsActionType{
-    CouponsDownloaded="CouponsDownloaded",
-    CouponAdded="CouponAdded",
-    CouponUpdated="CouponUpdated",
-    CouponDeleted="CouponDeleted"
+export enum CouponsActionType {
+    CouponsDownloaded = "CouponsDownloaded",
+    CouponAdded = "CouponAdded",
+    CouponUpdated = "CouponUpdated",
+    CouponDeleted = "CouponDeleted"
 }
 //----------------------------------------------------------------------------------
-//product action - האובייקט המכיל את המידע עבור הפעולה שאנו מבצעים על המידע ברמת האפליקציה 
-export interface CouponsAction{
+//product action 
+export interface CouponsAction {
     type: CouponsActionType;
-    payload?: any;//payload?any, if the payload can be empty
+    payload?: any;
     category?: string;
+    index?: number;
+    amount?: number;
+    numOfPages?: number;
+    totalElements?: number;
 }
 //----------------------------------------------------------------------------------
-//products action creators-פונקציות המקבלות את ה- payload
-//ומחזירות אובייקט action 
-//מתאים עבור כל פעולה 
+//products action creators
 
-export function couponsDownloadedAction(coupons: CouponModel[], category: string): CouponsAction {
-    return { type: CouponsActionType.CouponsDownloaded, payload: coupons, category: category };
+export function couponsDownloadedAction(coupons: CouponModel[], category: string, index: number, amount: number, numOfPages: number, totalElements: number): CouponsAction {
+    return { type: CouponsActionType.CouponsDownloaded, payload: coupons, category: category, index: index, amount: amount, numOfPages: numOfPages, totalElements: totalElements };
 }
 
 export function couponAddedAction(coupon: CouponModel): CouponsAction {
@@ -60,11 +103,10 @@ export function couponDeletedAction(coupon: CouponModel): CouponsAction {
     return { type: CouponsActionType.CouponDeleted, payload: coupon };
 }
 //----------------------------------------------------------------------------------------
-//products reducer - פונקציה המבצעת את הפעולה בפועל 
-export function couponsReducer (currentState: CouponsState = new CouponsState(), action:CouponsAction): CouponsState {
-    //****functional programming**** TODO: check if can be replaced with concat
-    const newState = {...currentState}; //spread operator - שכפול אובייקט
-    switch(action.type){
+//products reducer 
+export function couponsReducer(currentState: CouponsState = new CouponsState(), action: CouponsAction): CouponsState {
+    const newState = { ...currentState };
+    switch (action.type) {
         case CouponsActionType.CouponAdded:
             // const categoryA = (action.payload as CouponModel).category
             // switchCategory(categoryA, newState).push(action.payload);//TODO: check if need to replace with concat
@@ -72,8 +114,15 @@ export function couponsReducer (currentState: CouponsState = new CouponsState(),
             break;
         case CouponsActionType.CouponsDownloaded:
             switchCategory(newState, action.category, action.payload, (source: CouponModel[], couponsDownloaded: CouponModel[]) => {
-                return couponsDownloaded;
-            });
+                const temp = [];
+                const range = action.index - source.length;
+                for (let i = 0; i < range; i++) {
+                    temp.push(null);
+                }
+                source.push(...temp);
+                source.splice(action.index, action.amount, ...couponsDownloaded);
+                return source;
+            }, action.numOfPages, action.totalElements);
             break;
         case CouponsActionType.CouponUpdated:
             const categoryU = (action.payload as CouponModel).category
@@ -103,31 +152,59 @@ export function couponsReducer (currentState: CouponsState = new CouponsState(),
             break;
     }
     return newState;
-   
+
 }
 
-function switchCategory(state: CouponsState, category: string, target: CouponModel[], fun: (source: CouponModel[], target: CouponModel[]) => CouponModel[]): void{
-    switch(category){
+function switchCategory(state: CouponsState, category: string, target: CouponModel[], fun: (source: CouponModel[], target: CouponModel[]) => CouponModel[], numOfPages?: number, totalElements?: number): void {
+    switch (category) {
         case "Electricity":
-            state.coupons.Electricity = fun(state.coupons.Electricity, target);
+            state.category.Electricity.coupons = fun(state.category.Electricity.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.Electricity.numOfPages = numOfPages;
+                state.category.Electricity.totalElements = totalElements;
+            }
             break;
         case "Spa":
-            state.coupons.Spa = fun(state.coupons.Spa, target);
+            state.category.Spa.coupons = fun(state.category.Spa.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.Spa.numOfPages = numOfPages;
+                state.category.Spa.totalElements = totalElements;
+            }
             break;
         case "Restaurant":
-            state.coupons.Restaurant = fun(state.coupons.Restaurant, target);
+            state.category.Restaurant.coupons = fun(state.category.Restaurant.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.Restaurant.numOfPages = numOfPages;
+                state.category.Restaurant.totalElements = totalElements;
+            }
             break;
         case "Vacation":
-            state.coupons.Vacation = fun(state.coupons.Vacation, target);
+            state.category.Vacation.coupons = fun(state.category.Vacation.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.Vacation.numOfPages = numOfPages;
+                state.category.Vacation.totalElements = totalElements;
+            }
             break;
         case "Attractions":
-            state.coupons.Attractions = fun(state.coupons.Attractions, target);
+            state.category.Attractions.coupons = fun(state.category.Attractions.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.Attractions.numOfPages = numOfPages;
+                state.category.Attractions.totalElements = totalElements;
+            }
             break;
         case "Furniture":
-            state.coupons.Furniture = fun(state.coupons.Furniture, target);
+            state.category.Furniture.coupons = fun(state.category.Furniture.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.Furniture.numOfPages = numOfPages;
+                state.category.Furniture.totalElements = totalElements;
+            }
             break;
         case "":
-            state.coupons.All = fun(state.coupons.All, target);
+            state.category.All.coupons = fun(state.category.All.coupons, target);
+            if (numOfPages != undefined) {
+                state.category.All.numOfPages = numOfPages;
+                state.category.All.totalElements = totalElements;
+            }
             break;
     }
 }
