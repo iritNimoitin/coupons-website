@@ -107,7 +107,7 @@ export default function CouponCard(props: CouponCardProps) {
           id={props.coupon.id.toString()}
           className={classes.media}
           title={props.coupon.title}
-          image={props.coupon.images ? props.coupon.images[0] : ""}
+          image={props.coupon.imagesSrc ? props.coupon.imagesSrc[0] : ""}
         />
       </NavLink>
       <CardContent>

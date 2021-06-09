@@ -145,7 +145,7 @@ function switchCategory(state: AuthState, category: string, target: CouponModel[
             (state.user as CustomerModel | CompanyModel).coupons.Furniture =
                 fun((state.user as CustomerModel | CompanyModel).coupons.Furniture, target);
             break;
-        case "":
+        case "All":
             (state.user as CustomerModel | CompanyModel).coupons.All =
                 fun((state.user as CustomerModel | CompanyModel).coupons.All, target);
             break;

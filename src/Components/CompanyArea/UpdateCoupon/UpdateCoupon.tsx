@@ -18,6 +18,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import CompanyModel from "../../../Models/CompanyModel";
 import CouponModel from "../../../Models/CouponModel";
 import { RouteComponentProps } from "react-router";
+import jwtAxios from "../../../Services/jwtAxios";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,22 +61,24 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
     couponExist: false,
     imagesSelect: null
   });
+  const [imagesUploaded, setImagesUploaded] = React.useState<FileList>();
   const [category, setCategory] = React.useState(props.match.params.category);
-
   useEffect(() => {
     const category = props.match.params.category;
     const id = parseInt(props.match.params.id);
-    let coupon = getCategory(category).coupons.find(coupon => coupon.id === id);
+    let coupon = getCategory("All").coupons.find(coupon => coupon.id === id);
     if (coupon === undefined) {
-      coupon = getCategory("").coupons.find(coupon => coupon.id === id);
+      coupon = getCategory(category).coupons.find(coupon => coupon.id === id);
       if (coupon === undefined) {
         const user = store.getState().AuthState.user;
-        coupon = getUserCategory(category, (user as CompanyModel)).find(coupon => coupon.id === id);
+        coupon = getUserCategory("All", (user as CompanyModel)).find(coupon => coupon.id === id);
+        if (coupon === undefined) {
+          coupon = getUserCategory(category, (user as CompanyModel)).find(coupon => coupon.id === id);
+        }
       }
     }
-    console.log(coupon.imagesNames);
     const imagesSelect: boolean[] = [];
-    for (let i = 0; i < coupon.images.length; i++) {
+    for (let i = 0; i < coupon.imagesSrc.length; i++) {
       imagesSelect[i] = false;
     }
     setValues({
@@ -91,36 +94,34 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
   async function send(coupon: CouponModel) {
     try {
       const fromData = new FormData();
+      fromData.append("id", values.coupon.id.toString());
       fromData.append("title", coupon.title);
       fromData.append("description", coupon.description);
       fromData.append("startDate", coupon.startDate.toString());
       fromData.append("endDate", coupon.endDate.toString());
       fromData.append("price", coupon.price.toString());
       fromData.append("amount", coupon.amount.toString());
-      // coupon.imageToSend
       fromData.append("category", category);
-      let url = globals.urls.auth.register;
-      // if(values.clientType === "Customer"){
-      //     url = url + "customer/";
-      //     headers = {
-      //         'email': (user as CustomerModel).email,
-      //         'password': (user as CustomerModel).password,
-      //         'firstName': (user as CustomerModel).firstName,
-      //         'lastName': (user as CustomerModel).lastName
-      //     }
-      // } else {
-      //     url = url + "company/";
-      //     headers = {
-      //         'email': (user as CompanyModel).email,
-      //         'password': (user as CompanyModel).password,
-      //         'name': (user as CompanyModel).name
-      //     }
-      // }
-      // const response = await jwtAxios.post(url, null, { headers });
-      // const client = getUserFromToken(response.data, values.clientType);
-      // store.dispatch(registerAction((client as CustomerModel | CompanyModel), values.clientType));
-      // notify.success("you have been successfully registered!");
-      // history.push("/home"); //redirect to home on success
+      for (let i = 0; i < coupon.imagesFiles.length; i++) {
+        fromData.append("images", coupon.imagesFiles.item(i));
+      }
+      console.log(fromData.get("images"));
+      const imagesToDelete: string[] = [];
+      values.imagesSelect.forEach((element: boolean, index: number) => {
+        if (element === true) {
+          imagesToDelete.push(values.coupon.imagesNames[index]);
+        }
+      });
+      const headers = {
+        imagesToDelete: imagesToDelete
+      };
+
+      let url = globals.urls.company.coupons
+
+      const response = await jwtAxios.put(url, fromData, { headers });
+      // store.dispatch(registerAction(());
+      notify.success("you have been successfully registered!");
+      history.push("/home"); //redirect to home on success
     }
     catch (err) {
       notify.error(err);
@@ -135,6 +136,11 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
     const chooseIndex = parseInt((event.target as HTMLInputElement).value);
     const newImagesSelect = values.imagesSelect.map((bool: boolean, index: number) => index === chooseIndex ? !bool : bool);
     setValues({ ...values, imagesSelect: newImagesSelect });
+  };
+
+  const handleUploadChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.files);
+    setImagesUploaded(event.target.files);
   };
 
   return (
@@ -184,14 +190,14 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
               <FormLabel component="legend">Choose images to delete</FormLabel>
               <br />
               <FormGroup row>
-                {values.coupon.images.map((i: string, index: number) =>
+                {values.coupon.imagesSrc.map((imageSrc: string, index: number) =>
                   <>
                     <FormControlLabel
                       control={<Checkbox indeterminate checked={values.imagesSelect[index]} onChange={handleChangeDelete} value={index} />}
-                      label={values.coupon.imagesNames[i]}
+                      label={values.coupon.imagesNames[index]}
                     />
                     &nbsp;
-                    <img src={i} width="150" height="150" />
+                    <img src={imageSrc} width="150" height="150" />
                     &nbsp;&nbsp;&nbsp;
                   </>
                 )}
@@ -201,7 +207,7 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
             <br />
             <Button variant="contained" component="label">
               Upload images
-              <input type="file" name="imagesToSend" accept="image/*" ref={register()} multiple hidden />
+              <input type="file" name="imagesFiles" onChange={handleUploadChange} accept="image/*" ref={register()} multiple hidden />
             </Button>
             <br />
             <br />
@@ -209,6 +215,16 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
             <br />
             <br />
           </form>
+          <br />
+          {imagesUploaded &&
+            Array.from(imagesUploaded).forEach(image => {
+              <>
+                &nbsp;
+                <img src={URL.createObjectURL(image)} width="150" height="150" />
+                &nbsp;&nbsp;&nbsp;
+              </>
+            })
+          }
         </Box>
       }
 

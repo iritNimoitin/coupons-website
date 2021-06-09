@@ -199,7 +199,7 @@ function switchCategory(state: CouponsState, category: string, target: CouponMod
                 state.category.Furniture.totalElements = totalElements;
             }
             break;
-        case "":
+        case "All":
             state.category.All.coupons = fun(state.category.All.coupons, target);
             if (numOfPages != undefined) {
                 state.category.All.numOfPages = numOfPages;

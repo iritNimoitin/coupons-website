@@ -2,7 +2,7 @@ import { Component } from "react";
 import { RouteComponentProps } from "react-router";
 import "./CouponDetails.css";
 import CouponModel from "../../../Models/CouponModel";
-import store, { getCategory } from "../../../Redux/Stores";
+import store, { getCategory, getUserCategory } from "../../../Redux/Stores";
 import Button from '@material-ui/core/Button';
 import notify from "../../../Services/Notification";
 import ShoppingCartOutlinedIcon from '@material-ui/icons/ShoppingCartOutlined';
@@ -12,6 +12,8 @@ import customerService from "../../../Services/CustomerService";
 import { Typography } from "@material-ui/core";
 import ArrowBackOutlinedIcon from '@material-ui/icons/ArrowBackOutlined';
 import { withRouter } from 'react-router-dom';
+import CustomerModel from "../../../Models/CustomerModel";
+import CompanyModel from "../../../Models/CompanyModel";
 
 interface RouteParam {
     id: string;
@@ -42,15 +44,25 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
         try {
             const id = +this.props.match.params.id;
             const category = this.props.match.params.category;
-            let coupon = getCategory("").coupons.find(c => c.id === id);
-            if (coupon == undefined) {
+            let coupon = getCategory("All").coupons.find(c => c.id === id);
+            if (coupon === undefined) {
                 coupon = getCategory(category).coupons.find(c => c.id === id);
+                if (coupon === undefined) {
+                    const clientType = store.getState().AuthState.clientType;
+                    let user;
+                    if (clientType) {
+                        user = store.getState().AuthState.user;
+                        coupon = getUserCategory("All", (user as CompanyModel | CustomerModel)).find(coupon => coupon.id === id);
+                        if (coupon === undefined) {
+                            coupon = getUserCategory(category, (user as CompanyModel | CustomerModel)).find(coupon => coupon.id === id);
+                        }
+                    }
+                }
             }
             const type = store.getState().AuthState.clientType;
-
             this.setState({
                 coupon: coupon,
-                images: coupon.images,
+                images: coupon.imagesSrc,
                 clientType: type
             });
         }

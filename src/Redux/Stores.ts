@@ -27,7 +27,7 @@ export function getCategory(category: string): CouponSet {
             return store.getState()?.CouponsState.category.Attractions;
         case "Furniture":
             return store.getState()?.CouponsState.category.Furniture;
-        case "":
+        case "All":
             return store.getState()?.CouponsState.category.All;
     }
 }

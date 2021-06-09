@@ -32,7 +32,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
         super(props);
         this.state = {
             coupons: [],
-            category: this.props.match.params.category || '',
+            category: this.props.match.params.category || "All",
             page: 0,
             numOfPages: 0,
             totalElements: 0
@@ -44,7 +44,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
     }
 
     private getCoupons() {
-        const category = this.props.match.params.category || "";
+        const category = this.props.match.params.category || "All";
         const index = this.state.page * 8;
         if (!getCategory(category).coupons[index]) {
             this.getCouponsFromServer();
@@ -60,7 +60,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
 
     private async getCouponsFromServer() {
         try {
-            const category = this.props.match.params.category || "";
+            let category = this.props.match.params.category || "";
             const itemsPerPage = this.state.page !== this.state.numOfPages - 1 ? 8 : this.state.totalElements - (this.state.page * 8);
             const headers = {
                 'pageNumber': this.state.page,
@@ -69,8 +69,10 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
                 'category': category
             }
             let url = globals.urls.coupons;
-            if (category !== '') {
+            if (category !== "") {
                 url = url + "category/";
+            } else {
+                category = "All";
             }
             const response = await axios.get(url, { headers });
             this.setState({
@@ -84,7 +86,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
                     numOfPages: response.data.totalPages
                 })
             }
-            console.log(response.data.content);
+            console.log("$$$$$$$$$$$$$$4");
             store.dispatch(couponsDownloadedAction(response.data.content, category, this.state.page * 8, itemsPerPage, pages, response.data.totalElements));
         } catch (err) {
             notify.error(err);
@@ -96,7 +98,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
     }
 
     public componentDidUpdate(prevProps: CouponListProps, prevState: CouponsListState) {
-        const category = this.props.match.params.category || '';
+        const category = this.props.match.params.category || "All";
         if (prevProps.match.params.category !== category && this.props.match.params.category !== undefined) {
             this.getCoupons();
         } else if (this.state.page !== prevState.page) {
