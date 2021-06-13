@@ -86,7 +86,6 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
                     numOfPages: response.data.totalPages
                 })
             }
-            console.log("$$$$$$$$$$$$$$4");
             store.dispatch(couponsDownloadedAction(response.data.content, category, this.state.page * 8, itemsPerPage, pages, response.data.totalElements));
         } catch (err) {
             notify.error(err);

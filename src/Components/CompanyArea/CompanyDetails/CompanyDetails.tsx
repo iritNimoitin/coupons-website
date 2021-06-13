@@ -12,10 +12,11 @@ function CompanyDetails(): JSX.Element {
 
     return (
         <div className="CompanyDetails">
-			{company && 
+            {company &&
                 <>
                     <h2>{company.name}</h2>
                     <h5>{company.email}</h5>
+
                 </>
             }
         </div>

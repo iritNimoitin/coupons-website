@@ -19,6 +19,8 @@ import CompanyModel from "../../../Models/CompanyModel";
 import CouponModel from "../../../Models/CouponModel";
 import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
+import { couponUpdatedAction } from "../../../Redux/CouponsState";
+import { userCouponUpdatedAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,7 +57,9 @@ interface UpdateCouponProps extends RouteComponentProps<RouteParam> {
 }
 
 function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
-  const { register, handleSubmit } = useForm<CouponModel>();
+  const { register, handleSubmit, errors } = useForm<CouponModel>();
+  const [startDate, setStartDate] = React.useState(new Date());
+  const [endDate, setEndDate] = React.useState(new Date());
   const [values, setValues] = React.useState({
     coupon: null,
     couponExist: false,
@@ -63,6 +67,7 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
   });
   const [imagesUploaded, setImagesUploaded] = React.useState<FileList>();
   const [category, setCategory] = React.useState(props.match.params.category);
+
   useEffect(() => {
     const category = props.match.params.category;
     const id = parseInt(props.match.params.id);
@@ -78,7 +83,7 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
       }
     }
     const imagesSelect: boolean[] = [];
-    for (let i = 0; i < coupon.imagesSrc.length; i++) {
+    for (let i = 0; i < coupon.imagesNames.length; i++) {
       imagesSelect[i] = false;
     }
     setValues({
@@ -86,6 +91,8 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
       couponExist: true,
       imagesSelect: imagesSelect
     });
+    setStartDate(new Date(coupon.startDate));
+    setEndDate(new Date(coupon.endDate));
   }, []);
 
   const classes = useStyles();
@@ -95,6 +102,7 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
     try {
       const fromData = new FormData();
       fromData.append("id", values.coupon.id.toString());
+      fromData.append("idC", values.coupon.company.id.toString());
       fromData.append("title", coupon.title);
       fromData.append("description", coupon.description);
       fromData.append("startDate", coupon.startDate.toString());
@@ -105,23 +113,61 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
       for (let i = 0; i < coupon.imagesFiles.length; i++) {
         fromData.append("images", coupon.imagesFiles.item(i));
       }
-      console.log(fromData.get("images"));
+      let url = globals.urls.company.coupons;
+      if (coupon.imagesFiles.length > 0) {
+        url = url + "images/";
+      }
+
+      const imagesNames: string[] = [];
       const imagesToDelete: string[] = [];
       values.imagesSelect.forEach((element: boolean, index: number) => {
         if (element === true) {
           imagesToDelete.push(values.coupon.imagesNames[index]);
+        } else {
+          imagesNames.push(values.coupon.imagesNames[index]);
         }
       });
       const headers = {
         imagesToDelete: imagesToDelete
       };
 
-      let url = globals.urls.company.coupons
-
       const response = await jwtAxios.put(url, fromData, { headers });
-      // store.dispatch(registerAction(());
-      notify.success("you have been successfully registered!");
-      history.push("/home"); //redirect to home on success
+
+      for (let i = 0; i < coupon.imagesFiles.length; i++) {
+        imagesNames.push(coupon.imagesFiles.item(i).name);
+      }
+
+      const couponU: CouponModel = {
+        id: values.coupon.id,
+        company: values.coupon.company,
+        title: coupon.title,
+        companyId: values.coupon.company.id,
+        category: category,
+        description: coupon.description,
+        startDate: coupon.startDate,
+        endDate: coupon.endDate,
+        amount: coupon.amount,
+        price: coupon.price,
+        imagesNames: imagesNames,
+        imagesFiles: null,
+        customers: null
+      }
+      const user = store.getState().AuthState.user;
+      if (getCategory("All").coupons.find(coupon => coupon.id === couponU.id)) {
+        store.dispatch(couponUpdatedAction(couponU, "All"));
+      }
+      if (getCategory(category).coupons.find(coupon => coupon.id === couponU.id)) {
+        store.dispatch(couponUpdatedAction(couponU, category));
+      }
+      if (getUserCategory("All", (user as CompanyModel)).find(coupon => coupon.id === couponU.id)) {
+        store.dispatch(userCouponUpdatedAction(couponU, "All"));
+      }
+      if (getUserCategory(category, (user as CompanyModel)).find(coupon => coupon.id === couponU.id)) {
+        store.dispatch(userCouponUpdatedAction(couponU, category));
+      }
+
+      notify.success("you have been successfully updating the coupon!");
+      history.push("/company/coupons");
     }
     catch (err) {
       notify.error(err);
@@ -139,7 +185,6 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
   };
 
   const handleUploadChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.files);
     setImagesUploaded(event.target.files);
   };
 
@@ -152,23 +197,52 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
             <Typography variant="h4" className="Headline"><PersonAddIcon />Update coupon</Typography>
             <br />
 
-            <TextField defaultValue={values.coupon.title} label="Title" variant="outlined" type="text" name="title" inputRef={register()} className={clsx(classes.margin, classes.textField)} />
+            <TextField defaultValue={values.coupon.title} label="Title" variant="outlined" type="text" name="title" inputRef={register({
+              required: { value: true, message: "Missing Title." },
+              minLength: { value: 3, message: "Title is too short" },
+              maxLength: { value: 50, message: "Title is too long" }
+            })} className={clsx(classes.margin, classes.textField)} />
+            <span className="error">{errors.title?.message}</span>
             <br />
 
-            <TextField defaultValue={values.coupon.description} label="Description" variant="outlined" type="text" name="description" multiline rows={4} inputRef={register()} className={clsx(classes.margin, classes.textField)} />
+            <TextField defaultValue={values.coupon.description} label="Description" variant="outlined" type="text" name="description" multiline rows={4} inputRef={register({
+              required: { value: true, message: "Missing Description." },
+              minLength: { value: 50, message: "Description is too short." }
+            })} className={clsx(classes.margin, classes.textField)} />
+            <span className="error">{errors.description?.message}</span>
             <br />
 
-            <TextField defaultValue={values.coupon.startDate} label="Start Date" variant="outlined" type="Date" name="startDate" inputRef={register()} className={clsx(classes.margin, classes.textField)} />
+            <TextField defaultValue={values.coupon.startDate} label="Start Date" variant="outlined" type="Date" name="startDate" onChange={(event) => setStartDate(new Date(event.target.value))} inputRef={register({
+              required: { value: true, message: "Missing Start Date." },
+              min: { value: (new Date()).toString(), message: "Start Date is not valid." },
+              max: { value: endDate.toString(), message: "Start Date can't be after end date." }
+            })} className={clsx(classes.margin, classes.textField)} />
+            <span className="error">{errors.startDate?.message}</span>
             <br />
 
-            <TextField defaultValue={values.coupon.endDate} label="End Date" variant="outlined" type="Date" name="endDate" inputRef={register()} className={clsx(classes.margin, classes.textField)} />
+            <TextField defaultValue={values.coupon.endDate} label="End Date" variant="outlined" type="Date" name="endDate" onChange={(event) => setEndDate(new Date(event.target.value))} inputRef={register({
+              required: { value: true, message: "Missing End Date." },
+              min: { value: startDate.toString(), message: "End Date can't be before start date." }
+            })} className={clsx(classes.margin, classes.textField)} />
+            <span className="error">{errors.endDate?.message}</span>
             <br />
 
-            <TextField defaultValue={values.coupon.price} label="Price" variant="outlined" type="number" name="price" inputRef={register()} className={clsx(classes.margin, classes.textField)} />
+            <TextField defaultValue={values.coupon.price} label="Price" variant="outlined" type="number" name="price" inputRef={register({
+              required: { value: true, message: "Missing Price." },
+              min: { value: 1, message: "Price have to be above 1." },
+              max: { value: 100000, message: "Price have to be below 100000." }
+            })} className={clsx(classes.margin, classes.textField)} />
+            <span className="error">{errors.price?.message}</span>
             <br />
 
-            <TextField defaultValue={values.coupon.amount} label="Amount" variant="outlined" type="number" name="amount" inputRef={register()} className={clsx(classes.margin, classes.textField)} />
+            <TextField defaultValue={values.coupon.amount} label="Amount" variant="outlined" type="number" name="amount" inputRef={register({
+              required: { value: true, message: "Missing Amount." },
+              min: { value: 1, message: "Amount have to be above 1." },
+              max: { value: 100000, message: "Amount have to be below 100000." }
+            })} className={clsx(classes.margin, classes.textField)} />
+            <span className="error">{errors.amount?.message}</span>
             <br />
+
             <FormControl className={classes.category}>
               <InputLabel>Category</InputLabel>
               <Select
@@ -190,14 +264,14 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
               <FormLabel component="legend">Choose images to delete</FormLabel>
               <br />
               <FormGroup row>
-                {values.coupon.imagesSrc.map((imageSrc: string, index: number) =>
+                {values.coupon.imagesNames.map((imageName: string, index: number) =>
                   <>
-                    <FormControlLabel
+                    <FormControlLabel key={index}
                       control={<Checkbox indeterminate checked={values.imagesSelect[index]} onChange={handleChangeDelete} value={index} />}
                       label={values.coupon.imagesNames[index]}
                     />
                     &nbsp;
-                    <img src={imageSrc} width="150" height="150" />
+                    <img src={globals.urls.images + values.coupon.category + "/" + values.coupon.id + "/" + values.coupon.imagesNames[index]} width="150" height="150" />
                     &nbsp;&nbsp;&nbsp;
                   </>
                 )}

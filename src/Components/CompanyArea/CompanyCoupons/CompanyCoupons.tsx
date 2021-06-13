@@ -13,7 +13,7 @@ import "./CompanyCoupons.css";
 interface CompanyCouponsState {
     coupons: CouponModel[];
     category: string;
-    totalElements: number;
+    maxPrice: number;
 }
 
 class CompanyCoupons extends Component<{}, CompanyCouponsState> {
@@ -23,7 +23,7 @@ class CompanyCoupons extends Component<{}, CompanyCouponsState> {
         this.state = {
             coupons: [],
             category: store.getState().SharedState.companyCouponsCategory,
-            totalElements: 0
+            maxPrice: 0
         };
     }
 
@@ -42,6 +42,16 @@ class CompanyCoupons extends Component<{}, CompanyCouponsState> {
                     category: category
                 });
                 this.getCoupons();
+            } else if (getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).length !== this.state.coupons.length) {
+                this.setState({
+                    ...this.state,
+                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
+                })
+            }
+            if (store.getState().SharedState.companyMaxPrice !== undefined && this.state.maxPrice !== store.getState().SharedState.companyMaxPrice) {
+                this.setState({
+                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).filter(coupon => coupon.price < store.getState().SharedState.companyMaxPrice)
+                })
             }
         });
     }
@@ -67,8 +77,7 @@ class CompanyCoupons extends Component<{}, CompanyCouponsState> {
             }
             const response = await jwtAxios.get(url, { headers });
             this.setState({
-                coupons: response.data,
-                totalElements: response.data.length
+                coupons: response.data
             });
             store.dispatch(userCouponsDownloadedAction(response.data, category));
         } catch (err) {

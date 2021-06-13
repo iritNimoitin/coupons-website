@@ -14,6 +14,7 @@ import ArrowBackOutlinedIcon from '@material-ui/icons/ArrowBackOutlined';
 import { withRouter } from 'react-router-dom';
 import CustomerModel from "../../../Models/CustomerModel";
 import CompanyModel from "../../../Models/CompanyModel";
+import globals from "../../../Services/Globals";
 
 interface RouteParam {
     id: string;
@@ -62,7 +63,7 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
             const type = store.getState().AuthState.clientType;
             this.setState({
                 coupon: coupon,
-                images: coupon.imagesSrc,
+                images: coupon.imagesNames,
                 clientType: type
             });
         }
@@ -94,9 +95,9 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
                         <h3>Description: {this.state.coupon.description}</h3>
                         <div id="images">
                             <Carousel width={600}>
-                                {this.state.images.map(src =>
+                                {this.state.images.map(imageName =>
                                     <div>
-                                        <img src={src} />
+                                        <img src={globals.urls.images + this.state.coupon.category + "/" + this.state.coupon.id + "/" + imageName} />
                                     </div>
                                 )}
                             </Carousel>

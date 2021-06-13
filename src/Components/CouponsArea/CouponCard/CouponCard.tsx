@@ -85,7 +85,7 @@ export default function CouponCard(props: CouponCardProps) {
   }, []);
 
   const handleDelete = () => {
-    companyService.deleteCoupon(props.coupon.id);
+    companyService.deleteCoupon(props.coupon);
   }
 
   const handleUpdate = () => {
@@ -107,7 +107,7 @@ export default function CouponCard(props: CouponCardProps) {
           id={props.coupon.id.toString()}
           className={classes.media}
           title={props.coupon.title}
-          image={props.coupon.imagesSrc ? props.coupon.imagesSrc[0] : ""}
+          image={globals.urls.images + props.coupon.category + "/" + props.coupon.id + "/" + props.coupon.imagesNames[0]}
         />
       </NavLink>
       <CardContent>

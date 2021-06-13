@@ -31,7 +31,7 @@ class DevelopmentGlobals extends Globals {
             register: "http://localhost:8080/Auth/register/",
             login: "http://localhost:8080/Auth/login/"
         },
-        images: "http://localhost:8080/App/coupons/images/",
+        images: "http://localhost:8080/pics/",
         coupons: "http://localhost:8080/App/coupons/",
     };
 
@@ -64,7 +64,7 @@ class productionGlobal extends Globals {
             register: "http://localhost:8080/Auth/register/",
             login: "http://localhost:8080/Auth/login/"
         },
-        images: "http://localhost:8080/App/coupons/images/",
+        images: "http://localhost:8080/pics/",
         coupons: "http://localhost:8080/App/coupons/"
     };
 }

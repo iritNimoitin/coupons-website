@@ -50,14 +50,14 @@ export function logoutAction(): AuthAction {
 export function userCouponsDownloadedAction(coupons: CouponModel[], category: string): AuthAction {
     return { type: AuthActionType.UserCouponsDownloaded, payload: coupons, category: category };
 }
-export function userCouponAddedAction(coupon: CouponModel): AuthAction {
-    return { type: AuthActionType.UserCouponAdded, payload: coupon };
+export function userCouponAddedAction(coupon: CouponModel, category: string): AuthAction {
+    return { type: AuthActionType.UserCouponAdded, payload: coupon, category: category };
 }
-export function userCouponUpdatedAction(coupon: CouponModel): AuthAction {
-    return { type: AuthActionType.UserCouponUpdated, payload: coupon };
+export function userCouponUpdatedAction(coupon: CouponModel, category: string): AuthAction {
+    return { type: AuthActionType.UserCouponUpdated, payload: coupon, category: category };
 }
-export function userCouponDeletedAction(coupon: CouponModel): AuthAction {
-    return { type: AuthActionType.UserCouponDeleted, payload: coupon };
+export function userCouponDeletedAction(coupon: CouponModel, category: string): AuthAction {
+    return { type: AuthActionType.UserCouponDeleted, payload: coupon, category: category };
 }
 //----------------------------------------------------------
 //Auth reducer :
@@ -85,31 +85,23 @@ export function AuthReducer(currentState: AuthState = new AuthState(), action: A
             });
             break;
         case AuthActionType.UserCouponAdded:
-            // const categoryA = (action.payload as CouponModel).category
-            // switchCategory(categoryA, newState).push(action.payload);//TODO: check if need to replace with concat
-            // newState.coupons.All.push(action.payload);
-            break;
-        case AuthActionType.UserCouponUpdated:
-            const categoryU = (action.payload as CouponModel).category
-            switchCategory(newState, categoryU, action.payload, (source: CouponModel[], couponUpdated: CouponModel[]) => {
-                const index = source.indexOf(couponUpdated[0]);
-                source.splice(index, 1, couponUpdated[0]);
+            const categoryA = action.category;
+            switchCategory(newState, categoryA, [action.payload], (source: CouponModel[], couponAdded: CouponModel[]) => {
+                source.push(couponAdded[0]);
                 return source;
             });
-            switchCategory(newState, undefined, action.payload, (source: CouponModel[], couponUpdated: CouponModel[]) => {
+            break;
+        case AuthActionType.UserCouponUpdated:
+            const categoryU = action.category;
+            switchCategory(newState, categoryU, [action.payload], (source: CouponModel[], couponUpdated: CouponModel[]) => {
                 const index = source.indexOf(couponUpdated[0]);
                 source.splice(index, 1, couponUpdated[0]);
                 return source;
             });
             break;
         case AuthActionType.UserCouponDeleted:
-            const categoryD = (action.payload as CouponModel).category
-            switchCategory(newState, categoryD, action.payload, (source: CouponModel[], couponDeleted: CouponModel[]) => {
-                const index = source.indexOf(couponDeleted[0]);
-                source.splice(index, 1);
-                return source;
-            });
-            switchCategory(newState, undefined, action.payload, (source: CouponModel[], couponDeleted: CouponModel[]) => {
+            const categoryD = action.category;
+            switchCategory(newState, categoryD, [action.payload], (source: CouponModel[], couponDeleted: CouponModel[]) => {
                 const index = source.indexOf(couponDeleted[0]);
                 source.splice(index, 1);
                 return source;

@@ -8,7 +8,10 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import store from "../../../Redux/Stores";
-import { ChangeCompanyCouponsCategoryAction } from "../../../Redux/SharedState";
+import { ChangeCompanyCouponsCategoryAction, ChangeCompanyMaxPriceAction } from "../../../Redux/SharedState";
+import { useHistory } from "react-router";
+import { Button, TextField } from "@material-ui/core";
+import { AddBox } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,20 +28,35 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function CompanyCouponsPage(): JSX.Element {
   const [category, setCategory] = React.useState<string>("All");
+  // const [maxPrice, setMaxPrice] = React.useState<number>();
   const classes = useStyles();
+  const history = useHistory();
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleChangeCategory = (event: React.ChangeEvent<{ value: unknown }>) => {
     store.dispatch(ChangeCompanyCouponsCategoryAction(event.target.value as string));
     setCategory(event.target.value as string);
   };
 
+  const handleChangeMaxPrice = (event: React.ChangeEvent<{ value: unknown }>) => {
+    store.dispatch(ChangeCompanyMaxPriceAction(event.target.value as number));
+  }
+
+  const handleAddCoupon = () => {
+    let path = "/addCoupon";
+    history.push(path);
+  }
+
   return (
     <div className="CompanyCouponsPage">
+      <Button variant="contained" color="primary" size="small" onClick={handleAddCoupon}>
+        <AddBox />&nbsp;Add Coupon
+      </Button>
+
       <FormControl className={classes.formControl}>
         <InputLabel>Category</InputLabel>
         <Select
           value={category}
-          onChange={handleChange}
+          onChange={handleChangeCategory}
         >
           <MenuItem value="All">
             <em>All</em>
@@ -51,6 +69,9 @@ function CompanyCouponsPage(): JSX.Element {
           <MenuItem value={"Furniture"}>Furniture</MenuItem>
         </Select>
         <FormHelperText>Please choose a category</FormHelperText>
+      </FormControl>
+      <FormControl className={classes.formControl}>
+        <TextField label="Max Price" variant="standard" type="number" name="maxPrice" onChange={handleChangeMaxPrice} />
       </FormControl>
       <br />
       <CompanyCoupons />

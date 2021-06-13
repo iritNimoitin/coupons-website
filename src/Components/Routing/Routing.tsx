@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from "react-router";
 import Login from "../AuthArea/Login/Login";
 import Logout from "../AuthArea/Logout/Logout";
 import Register from "../AuthArea/Register/Register";
+import AddCoupon from "../CompanyArea/AddCoupon/AddCoupon";
 import CompanyCouponsPage from "../CompanyArea/CompanyCouponsPage/CompanyCouponsPage";
 import CompanyDetails from "../CompanyArea/CompanyDetails/CompanyDetails";
 import UpdateCoupon from "../CompanyArea/UpdateCoupon/UpdateCoupon";
@@ -27,6 +28,7 @@ function Routing(): JSX.Element {
                 <Route path="/company/coupons" component={CompanyCouponsPage} exact />
                 <Route path="/customer/details" component={CustomerDetails} exact />
                 <Route path="/update/:category/:id" component={UpdateCoupon} />
+                <Route path="/addCoupon" component={AddCoupon} />
                 <Redirect from="/" to="/home" exact />
                 <Route component={Page404} />
                 {/* must be last */}

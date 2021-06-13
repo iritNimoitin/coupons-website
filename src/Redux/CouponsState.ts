@@ -92,15 +92,15 @@ export function couponsDownloadedAction(coupons: CouponModel[], category: string
     return { type: CouponsActionType.CouponsDownloaded, payload: coupons, category: category, index: index, amount: amount, numOfPages: numOfPages, totalElements: totalElements };
 }
 
-export function couponAddedAction(coupon: CouponModel): CouponsAction {
-    return { type: CouponsActionType.CouponAdded, payload: coupon };
+export function couponAddedAction(coupon: CouponModel, category: string): CouponsAction {
+    return { type: CouponsActionType.CouponAdded, payload: coupon, category: category };
 }
 
-export function couponUpdatedAction(coupon: CouponModel): CouponsAction {
-    return { type: CouponsActionType.CouponUpdated, payload: coupon };
+export function couponUpdatedAction(coupon: CouponModel, category: string): CouponsAction {
+    return { type: CouponsActionType.CouponUpdated, payload: coupon, category: category };
 }
-export function couponDeletedAction(coupon: CouponModel): CouponsAction {
-    return { type: CouponsActionType.CouponDeleted, payload: coupon };
+export function couponDeletedAction(coupon: CouponModel, category: string): CouponsAction {
+    return { type: CouponsActionType.CouponDeleted, payload: coupon, category: category };
 }
 //----------------------------------------------------------------------------------------
 //products reducer 
@@ -108,9 +108,11 @@ export function couponsReducer(currentState: CouponsState = new CouponsState(), 
     const newState = { ...currentState };
     switch (action.type) {
         case CouponsActionType.CouponAdded:
-            // const categoryA = (action.payload as CouponModel).category
-            // switchCategory(categoryA, newState).push(action.payload);//TODO: check if need to replace with concat
-            // newState.coupons.All.push(action.payload);
+            const categoryA = action.category;
+            switchCategory(newState, categoryA, [action.payload], (source: CouponModel[], couponAdded: CouponModel[]) => {
+                source.push(couponAdded[0]);
+                return source;
+            });
             break;
         case CouponsActionType.CouponsDownloaded:
             switchCategory(newState, action.category, action.payload, (source: CouponModel[], couponsDownloaded: CouponModel[]) => {
@@ -125,26 +127,16 @@ export function couponsReducer(currentState: CouponsState = new CouponsState(), 
             }, action.numOfPages, action.totalElements);
             break;
         case CouponsActionType.CouponUpdated:
-            const categoryU = (action.payload as CouponModel).category
-            switchCategory(newState, categoryU, action.payload, (source: CouponModel[], couponUpdated: CouponModel[]) => {
-                const index = source.indexOf(couponUpdated[0]);
-                source.splice(index, 1, couponUpdated[0]);
-                return source;
-            });
-            switchCategory(newState, undefined, action.payload, (source: CouponModel[], couponUpdated: CouponModel[]) => {
+            const categoryU = action.category;
+            switchCategory(newState, categoryU, [action.payload], (source: CouponModel[], couponUpdated: CouponModel[]) => {
                 const index = source.indexOf(couponUpdated[0]);
                 source.splice(index, 1, couponUpdated[0]);
                 return source;
             });
             break;
         case CouponsActionType.CouponDeleted:
-            const categoryD = (action.payload as CouponModel).category
-            switchCategory(newState, categoryD, action.payload, (source: CouponModel[], couponDeleted: CouponModel[]) => {
-                const index = source.indexOf(couponDeleted[0]);
-                source.splice(index, 1);
-                return source;
-            });
-            switchCategory(newState, undefined, action.payload, (source: CouponModel[], couponDeleted: CouponModel[]) => {
+            const categoryD = action.category;
+            switchCategory(newState, categoryD, [action.payload], (source: CouponModel[], couponDeleted: CouponModel[]) => {
                 const index = source.indexOf(couponDeleted[0]);
                 source.splice(index, 1);
                 return source;
