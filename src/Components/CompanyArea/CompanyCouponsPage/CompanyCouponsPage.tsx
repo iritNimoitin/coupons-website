@@ -42,7 +42,7 @@ function CompanyCouponsPage(): JSX.Element {
   }
 
   const handleAddCoupon = () => {
-    let path = "/addCoupon";
+    let path = "/company/addCoupon";
     history.push(path);
   }
 

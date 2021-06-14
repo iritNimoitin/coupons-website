@@ -116,29 +116,29 @@ export function couponsReducer(currentState: CouponsState = new CouponsState(), 
             break;
         case CouponsActionType.CouponsDownloaded:
             switchCategory(newState, action.category, action.payload, (source: CouponModel[], couponsDownloaded: CouponModel[]) => {
-                const temp = [];
-                const range = action.index - source.length;
-                for (let i = 0; i < range; i++) {
-                    temp.push(null);
-                }
-                source.push(...temp);
-                source.splice(action.index, action.amount, ...couponsDownloaded);
+                source = source.concat(couponsDownloaded);
+                // const temp = [];
+                // const range = action.index - source.length;
+                // for (let i = 0; i < range; i++) {
+                //     temp.push(null);
+                // }
+                // source.push(...temp);
+                // source.splice(action.index, action.amount, ...couponsDownloaded);
                 return source;
             }, action.numOfPages, action.totalElements);
             break;
         case CouponsActionType.CouponUpdated:
             const categoryU = action.category;
             switchCategory(newState, categoryU, [action.payload], (source: CouponModel[], couponUpdated: CouponModel[]) => {
-                const index = source.indexOf(couponUpdated[0]);
-                source.splice(index, 1, couponUpdated[0]);
+                source = source.filter(coupon => coupon.id !== couponUpdated[0].id);
+                source.push(couponUpdated[0]);
                 return source;
             });
             break;
         case CouponsActionType.CouponDeleted:
             const categoryD = action.category;
             switchCategory(newState, categoryD, [action.payload], (source: CouponModel[], couponDeleted: CouponModel[]) => {
-                const index = source.indexOf(couponDeleted[0]);
-                source.splice(index, 1);
+                source = source.filter(coupon => coupon.id !== couponDeleted[0].id);
                 return source;
             });
             break;

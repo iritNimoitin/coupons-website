@@ -23,6 +23,7 @@ import { Unsubscribe } from 'redux';
 import store from '../../../Redux/Stores';
 import CustomerModel from '../../../Models/CustomerModel';
 import CompanyModel from '../../../Models/CompanyModel';
+import AdminMenu from '../../AdminArea/AdminMenu/AdminMenu';
 
 interface Props {
   window?: () => Window;
@@ -92,10 +93,17 @@ export default function HideAppBar(props: Props) {
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <SearchAppBar />
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              {clientType === "Company" &&
+              {clientType === "Company" ?
                 <NavLink to={"/company/coupons"}>
-                  <StyledButton>My Couopns</StyledButton>
+                  <StyledButton>My Coupons</StyledButton>
                 </NavLink>
+                : clientType === "Customer" ?
+                  <NavLink to={"/customer/coupons"}>
+                    <StyledButton>My Coupons</StyledButton>
+                  </NavLink>
+                  : clientType === "Administrator" ?
+                    <AdminMenu />
+                    : null
               }
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

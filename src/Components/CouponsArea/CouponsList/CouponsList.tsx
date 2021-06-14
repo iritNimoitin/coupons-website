@@ -50,7 +50,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
             this.getCouponsFromServer();
         } else {
             this.setState({
-                coupons: getCategory(category).coupons.slice(index, index + 8),
+                coupons: getCategory(category).coupons.filter((coupon, i) => i >= index && i < index + 8),
                 category: category,
                 numOfPages: getCategory(category).numOfPages,
                 totalElements: getCategory(category).totalElements

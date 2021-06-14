@@ -1,3 +1,6 @@
+import CouponModel from "../Models/CouponModel";
+import CustomerModel from "../Models/CustomerModel";
+import { userCouponAddedAction } from "../Redux/AuthState";
 import store from "../Redux/Stores";
 import globals from "./Globals";
 import jwtAxios from "./jwtAxios";
@@ -12,13 +15,15 @@ class CustomerService {
   //     notify.error("Please log in as customer for purchasing coupons.");
   //   }
 
-  public async purchaseCoupon(couponId: number) {
+  public async purchaseCoupon(coupon: CouponModel) {
     try {
       const headers = {
-        'token': store.getState().AuthState.user.token,
-        'couponId': couponId,
+        'couponId': coupon.id,
       }
       await jwtAxios.put(globals.urls.customer.coupons, null, { headers });
+      const user = (store.getState().AuthState.user as CustomerModel);
+      store.dispatch(userCouponAddedAction(coupon, "All"));
+      store.dispatch(userCouponAddedAction(coupon, coupon.category));
       notify.success("You have been successfully purchasing the coupon.");
     }
     catch (err) {

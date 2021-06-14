@@ -46,7 +46,7 @@ function SimpleMenu() {
       >
         <nav>
           <NavLink to="/coupons/All" exact>
-            <MenuItem onClick={handleClose}>Electricity</MenuItem>
+            <MenuItem onClick={handleClose}>All</MenuItem>
           </NavLink>
           <NavLink to="/coupons/Electricity" exact>
             <MenuItem onClick={handleClose}>Electricity</MenuItem>

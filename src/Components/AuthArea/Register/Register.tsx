@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Register(): JSX.Element {
-    const { register, handleSubmit, formState } = useForm<CustomerModel | CompanyModel>({
+    const { register, handleSubmit, formState, errors } = useForm<CustomerModel | CompanyModel>({
         mode: "onChange"
     });
 
@@ -122,8 +122,8 @@ function Register(): JSX.Element {
 
                     <TextField label="Email" variant="outlined" type="email" name="email" className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing Email." },
-
                     })} />
+                    <span className="error">{errors.email?.message}</span>
                     <br />
 
                     <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
@@ -157,6 +157,7 @@ function Register(): JSX.Element {
                         />
                         <PasswordStrengthBar password={values.password} />
                     </FormControl>
+                    <span className="error">{errors.password?.message}</span>
                     <br />
 
                     <FormControl component="fieldset">

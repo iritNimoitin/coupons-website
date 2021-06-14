@@ -1,6 +1,6 @@
+import "./CustomerCoupons.css";
 import { Component } from "react";
 import { Unsubscribe } from "redux";
-import CompanyModel from "../../../Models/CompanyModel";
 import CouponModel from "../../../Models/CouponModel";
 import { userCouponsDownloadedAction } from "../../../Redux/AuthState";
 import store, { getUserCategory } from "../../../Redux/Stores";
@@ -8,21 +8,21 @@ import globals from "../../../Services/Globals";
 import jwtAxios from "../../../Services/jwtAxios";
 import notify from "../../../Services/Notification";
 import CouponCard from "../../CouponsArea/CouponCard/CouponCard";
-import "./CompanyCoupons.css";
+import CustomerModel from "../../../Models/CustomerModel";
 
-interface CompanyCouponsState {
+interface CustomerCouponsState {
     coupons: CouponModel[];
     category: string;
     maxPrice: number;
 }
 
-class CompanyCoupons extends Component<{}, CompanyCouponsState> {
+class CustomerCoupons extends Component<{}, CustomerCouponsState> {
 
     public constructor(props: {}) {
         super(props);
         this.state = {
             coupons: [],
-            category: store.getState().SharedState.companyCouponsCategory,
+            category: store.getState().SharedState.customerCouponsCategory,
             maxPrice: 0
         };
     }
@@ -36,32 +36,32 @@ class CompanyCoupons extends Component<{}, CompanyCouponsState> {
     public componentDidMount() {
         this.getCoupons();
         this.unsubscribeMe = store.subscribe(() => {
-            const category = store.getState().SharedState.companyCouponsCategory;
+            const category = store.getState().SharedState.customerCouponsCategory;
             if (category !== this.state.category) {
                 this.setState({
                     category: category
                 });
                 this.getCoupons();
-            } else if (getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).length !== this.state.coupons.length) {
+            } else if (getUserCategory(category, (store.getState().AuthState.user as CustomerModel)).length !== this.state.coupons.length) {
                 this.setState({
                     ...this.state,
-                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
+                    coupons: getUserCategory(category, (store.getState().AuthState.user as CustomerModel))
                 })
             }
-            if (!store.getState().SharedState.companyMaxPrice) {
+            if (!store.getState().SharedState.customerMaxPrice) {
                 this.setState({
-                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
+                    coupons: getUserCategory(category, (store.getState().AuthState.user as CustomerModel))
                 })
-            } else if (this.state.maxPrice !== store.getState().SharedState.companyMaxPrice) {
+            } else if (this.state.maxPrice !== store.getState().SharedState.customerMaxPrice) {
                 this.setState({
-                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).filter(coupon => coupon.price < store.getState().SharedState.companyMaxPrice)
+                    coupons: getUserCategory(category, (store.getState().AuthState.user as CustomerModel)).filter(coupon => coupon.price < store.getState().SharedState.customerMaxPrice)
                 })
             }
         });
     }
 
     private getCoupons() {
-        const userCoupons = getUserCategory(store.getState().SharedState.companyCouponsCategory, (store.getState().AuthState.user as CompanyModel));
+        const userCoupons = getUserCategory(store.getState().SharedState.customerCouponsCategory, (store.getState().AuthState.user as CustomerModel));
         if (userCoupons.length === 0) {
             this.getCouponsFromServer();
         } else {
@@ -71,11 +71,11 @@ class CompanyCoupons extends Component<{}, CompanyCouponsState> {
 
     private getCouponsFromServer = async () => {
         try {
-            const category = store.getState().SharedState.companyCouponsCategory;
+            const category = store.getState().SharedState.customerCouponsCategory;
             const headers = {
                 'category': category
             }
-            let url = globals.urls.company.coupons;
+            let url = globals.urls.customer.coupons;
             if (category !== "All") {
                 url = url + "category/";
             }
@@ -91,11 +91,11 @@ class CompanyCoupons extends Component<{}, CompanyCouponsState> {
 
     public render(): JSX.Element {
         return (
-            <div className="CompanyCoupons">
+            <div className="CustomerCoupons">
                 {this.state.coupons.map(c => <CouponCard key={c.id} coupon={c} />)}
             </div>
         );
     }
 }
 
-export default CompanyCoupons;
+export default CustomerCoupons;

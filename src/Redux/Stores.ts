@@ -3,6 +3,7 @@ import { combineReducers, createStore } from "redux";
 import CompanyModel from "../Models/CompanyModel";
 import CouponModel from "../Models/CouponModel";
 import CustomerModel from "../Models/CustomerModel";
+import { AdminReducer } from "./AdminState";
 import { AuthReducer } from "./AuthState";
 import { CouponSet, couponsReducer } from "./CouponsState";
 import { SharedReducer } from "./SharedState";
@@ -10,7 +11,7 @@ import { SharedReducer } from "./SharedState";
 //--------------------------------------------------------------
 
 //multiple reducer:
-const reducers = combineReducers({ CouponsState: couponsReducer, AuthState: AuthReducer, SharedState: SharedReducer });
+const reducers = combineReducers({ CouponsState: couponsReducer, AuthState: AuthReducer, SharedState: SharedReducer, AdminState: AdminReducer });
 const store = createStore(reducers);
 
 export function getCategory(category: string): CouponSet {

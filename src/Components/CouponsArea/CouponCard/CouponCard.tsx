@@ -89,7 +89,7 @@ export default function CouponCard(props: CouponCardProps) {
   }
 
   const handleUpdate = () => {
-    let path = `/update/${props.coupon.category}/${props.coupon.id}`;
+    let path = `/company/update/${props.coupon.category}/${props.coupon.id}`;
     history.push(path);
   }
 

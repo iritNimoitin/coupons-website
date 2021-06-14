@@ -73,7 +73,7 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
     }
 
     public handlePurchase = () => {
-        customerService.purchaseCoupon(this.state.coupon.id);
+        customerService.purchaseCoupon(this.state.coupon);
     }
 
     public handleBack = () => {

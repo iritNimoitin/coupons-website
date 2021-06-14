@@ -6,12 +6,16 @@ import CustomerModel from "../Models/CustomerModel";
 export class SharedState {
     public companyCouponsCategory: string = "All";
     public companyMaxPrice: number = undefined;
+    public customerCouponsCategory: string = "All";
+    public customerMaxPrice: number = undefined;
 }
 //--------------------------------------------------------
 //Shared action types:
 export enum SharedActionType {
     ChangeCompanyCouponsCategory = "ChangeCompanyCouponsCategory",
-    ChangeCompanyMaxPrice = "ChangeCompanyMaxPrice"
+    ChangeCompanyMaxPrice = "ChangeCompanyMaxPrice",
+    ChangeCustomerCouponsCategory = "ChangeCustomerCouponsCategory",
+    ChangeCustomerMaxPrice = "ChangeCustomerMaxPrice"
 }
 //---------------------------------------------------------
 //Shared Action:
@@ -20,6 +24,8 @@ export interface SharedAction {
     //payload?: any;
     companyCouponsCategory?: string;
     companyMaxPrice?: number;
+    customerCouponsCategory?: string;
+    customerMaxPrice?: number;
 }
 //-------------------------------------------------------
 //action creators 
@@ -29,7 +35,12 @@ export function ChangeCompanyCouponsCategoryAction(companyCouponsCategory: strin
 export function ChangeCompanyMaxPriceAction(companyMaxPrice: number): SharedAction {
     return { type: SharedActionType.ChangeCompanyMaxPrice, companyMaxPrice: companyMaxPrice };
 }
-
+export function ChangeCustomerCouponsCategoryAction(customerCouponsCategory: string): SharedAction {
+    return { type: SharedActionType.ChangeCustomerCouponsCategory, customerCouponsCategory: customerCouponsCategory };
+}
+export function ChangeCustomerMaxPriceAction(customerMaxPrice: number): SharedAction {
+    return { type: SharedActionType.ChangeCustomerMaxPrice, customerMaxPrice: customerMaxPrice };
+}
 //----------------------------------------------------------
 //Shared reducer :
 export function SharedReducer(currentState: SharedState = new SharedState(), action: SharedAction): SharedState {
@@ -41,6 +52,12 @@ export function SharedReducer(currentState: SharedState = new SharedState(), act
             break;
         case SharedActionType.ChangeCompanyMaxPrice:
             newState.companyMaxPrice = action.companyMaxPrice;
+            break;
+        case SharedActionType.ChangeCustomerCouponsCategory:
+            newState.customerCouponsCategory = action.customerCouponsCategory;
+            break;
+        case SharedActionType.ChangeCustomerMaxPrice:
+            newState.customerMaxPrice = action.customerMaxPrice;
             break;
     }
     return newState;

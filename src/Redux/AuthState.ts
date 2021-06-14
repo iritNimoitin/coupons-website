@@ -94,16 +94,15 @@ export function AuthReducer(currentState: AuthState = new AuthState(), action: A
         case AuthActionType.UserCouponUpdated:
             const categoryU = action.category;
             switchCategory(newState, categoryU, [action.payload], (source: CouponModel[], couponUpdated: CouponModel[]) => {
-                const index = source.indexOf(couponUpdated[0]);
-                source.splice(index, 1, couponUpdated[0]);
+                source = source.filter(coupon => coupon.id !== couponUpdated[0].id);
+                source.push(couponUpdated[0]);
                 return source;
             });
             break;
         case AuthActionType.UserCouponDeleted:
             const categoryD = action.category;
             switchCategory(newState, categoryD, [action.payload], (source: CouponModel[], couponDeleted: CouponModel[]) => {
-                const index = source.indexOf(couponDeleted[0]);
-                source.splice(index, 1);
+                source = source.filter(coupon => coupon.id !== couponDeleted[0].id);
                 return source;
             });
             break;
