@@ -8,7 +8,7 @@ import { couponsDownloadedAction } from "../../../Redux/CouponsState";
 import notify from "../../../Services/Notification";
 import CouponCard from "../CouponCard/CouponCard";
 import { RouteComponentProps, withRouter } from "react-router";
-import PagesToggle from "../PagesToggle/PagesToggle";
+import TablePagination from '@material-ui/core/TablePagination';
 
 interface RouteParam {
     category: string;
@@ -23,6 +23,7 @@ interface CouponsListState {
     category: string;
     page: number;
     numOfPages: number;
+    itemsPerPage: number;
     totalElements: number;
 }
 
@@ -35,6 +36,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
             category: this.props.match.params.category || "All",
             page: 0,
             numOfPages: 0,
+            itemsPerPage: 8,
             totalElements: 0
         };
     }
@@ -45,12 +47,12 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
 
     private getCoupons() {
         const category = this.props.match.params.category || "All";
-        const index = this.state.page * 8;
-        if (!getCategory(category).coupons[index]) {
+        const index = this.state.page * this.state.itemsPerPage;
+        if (getCategory(category).coupons.length === 0) {
             this.getCouponsFromServer();
         } else {
             this.setState({
-                coupons: getCategory(category).coupons.filter((coupon, i) => i >= index && i < index + 8),
+                coupons: getCategory(category).coupons.filter((coupon, i) => i >= index && i < index + this.state.itemsPerPage),
                 category: category,
                 numOfPages: getCategory(category).numOfPages,
                 totalElements: getCategory(category).totalElements
@@ -61,10 +63,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
     private async getCouponsFromServer() {
         try {
             let category = this.props.match.params.category || "";
-            const itemsPerPage = this.state.page !== this.state.numOfPages - 1 ? 8 : this.state.totalElements - (this.state.page * 8);
             const headers = {
-                'pageNumber': this.state.page,
-                'itemsPerPage': itemsPerPage,
                 'sortBy': 'price',
                 'category': category
             }
@@ -76,24 +75,14 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
             }
             const response = await axios.get(url, { headers });
             this.setState({
-                coupons: response.data.content,
-                totalElements: response.data.totalElements
-            });
-            let pages = this.state.numOfPages;
-            if (this.state.page !== this.state.numOfPages - 1) {
-                pages = response.data.totalPages;
-                this.setState({
-                    numOfPages: response.data.totalPages
-                })
-            }
-            store.dispatch(couponsDownloadedAction(response.data.content, category, this.state.page * 8, itemsPerPage, pages, response.data.totalElements));
+                coupons: response.data.filter((coupon: CouponModel, i: number) => i >= 0 && i < this.state.itemsPerPage),
+                numOfPages: Math.round(response.data.length / this.state.itemsPerPage),
+                totalElements: response.data.length
+            })
+            store.dispatch(couponsDownloadedAction(response.data, category, this.state.numOfPages, response.data.length));
         } catch (err) {
             notify.error(err);
         }
-    }
-
-    public handlePageChange = (page: number) => {
-        this.setState({ page: page - 1 });
     }
 
     public componentDidUpdate(prevProps: CouponListProps, prevState: CouponsListState) {
@@ -102,15 +91,41 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
             this.getCoupons();
         } else if (this.state.page !== prevState.page) {
             this.getCoupons();
+        } else if (this.state.itemsPerPage !== prevState.itemsPerPage) {
+            this.getCoupons();
         }
     }
 
+    public handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+        this.setState({
+            page: newPage
+        })
+    };
+
+    public handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        this.setState({
+            itemsPerPage: parseInt(event.target.value),
+            page: 0
+        })
+    };
+
     public render(): JSX.Element {
-        return (//some coupons came as null!
+        return (
             <div className="CouponsList">
-                {this.state.coupons.map(c => c && <CouponCard key={c.id} coupon={c} />)}
-                {this.state.numOfPages >= 1 &&
-                    <PagesToggle pageNumber={this.state.page + 1} numberOfPages={this.state.numOfPages} handlePageChange={this.handlePageChange} />}
+                <TablePagination
+                    component="div"
+                    count={this.state.totalElements}
+                    page={this.state.page}
+                    onChangePage={this.handleChangePage}
+                    rowsPerPage={this.state.itemsPerPage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    rowsPerPageOptions={[4, 8]}
+                />
+                <div className="couponsCards">
+                    {this.state.coupons.map(c => c && <CouponCard key={c.id} coupon={c} />)}
+                </div>
                 <br />
                 <br />
             </div>

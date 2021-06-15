@@ -22,7 +22,7 @@ class PagesToggle extends Component<PagesToggleProps> {
 
         return (
             <div className="PagesToggle">
-				<Pagination color='primary' variant='outlined' style={{ color: 'blue' }} count={this.props.numberOfPages} page={this.props.pageNumber} onChange={handleClick} />
+                <Pagination color='primary' variant='outlined' style={{ color: 'blue' }} count={this.props.numberOfPages} page={this.props.pageNumber} onChange={handleClick} />
             </div>
         );
     }

@@ -1,4 +1,4 @@
-.CouponsList {
+.CouponsList .couponsCards {
 	display: grid;
     grid-template-columns: auto auto auto auto;
     grid-gap: 15px;
