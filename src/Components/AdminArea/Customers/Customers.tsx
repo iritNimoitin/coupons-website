@@ -25,6 +25,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import axios from "axios";
 import { couponsDownloadedAction } from "../../../Redux/CouponsState";
+import { logoutAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles({
     table: {
@@ -71,6 +72,8 @@ function Customers(): JSX.Element {
             store.dispatch(CustomersDownloadedAction(response.data));
         } catch (err) {
             notify.error(err);
+            store.dispatch(logoutAction());
+            history.push("/login");
         }
     }
 
@@ -84,6 +87,8 @@ function Customers(): JSX.Element {
             store.dispatch(couponsDownloadedAction(response.data, "All", Math.round(response.data.length / 8), response.data.length));
         } catch (err) {
             notify.error(err);
+            store.dispatch(logoutAction());
+            history.push("/login");
         }
     }
 

@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function Login(): JSX.Element {
   const history = useHistory();
-  const { register, handleSubmit, formState } = useForm<CredentialModel>({
+  const { register, handleSubmit, formState, errors } = useForm<CredentialModel>({
     mode: "onChange"
   });
 
@@ -88,7 +88,7 @@ function Login(): JSX.Element {
     });
   };
 
-  const handleChange = (event: any) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, password: event.target.value });
   };
 
@@ -111,8 +111,8 @@ function Login(): JSX.Element {
 
           <TextField label="Email" variant="outlined" type="email" name="email" className={clsx(classes.margin, classes.textField)} inputRef={register({
             required: { value: true, message: "Missing Email." },
-
           })} />
+          <span className="error">{errors.email?.message}</span>
           <br />
 
           <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
@@ -122,7 +122,6 @@ function Login(): JSX.Element {
               label="Password"
               id="outlined-adornment-password"
               type={values.showPassword ? 'text' : 'password'}
-              value={values.password}
               onChange={handleChange}
               InputProps={{
                 endAdornment: (
@@ -143,6 +142,7 @@ function Login(): JSX.Element {
               })}
             />
           </FormControl>
+          <span className="error">{errors.password?.message}</span>
           <br />
 
           <FormControl variant="outlined" className={classes.formControl}>

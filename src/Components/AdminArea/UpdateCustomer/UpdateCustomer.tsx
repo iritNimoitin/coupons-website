@@ -14,6 +14,7 @@ import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { CustomerUpdatedAction } from "../../../Redux/AdminState";
 import CustomerModel from "../../../Models/CustomerModel";
+import { logoutAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

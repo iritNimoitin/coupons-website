@@ -20,7 +20,8 @@ import CouponModel from "../../../Models/CouponModel";
 import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { couponUpdatedAction } from "../../../Redux/CouponsState";
-import { userCouponUpdatedAction } from "../../../Redux/AuthState";
+import { logoutAction, userCouponUpdatedAction } from "../../../Redux/AuthState";
+import axios from "axios";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,21 +83,54 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
         }
       }
     }
-    const imagesSelect: boolean[] = [];
-    for (let i = 0; i < coupon.imagesNames.length; i++) {
-      imagesSelect[i] = false;
+    if (coupon !== undefined) {
+      const imagesSelect: boolean[] = [];
+      if (coupon.imagesNames) {
+        for (let i = 0; i < coupon.imagesNames.length; i++) {
+          imagesSelect[i] = false;
+        }
+      }
+      setValues({
+        coupon: coupon,
+        couponExist: true,
+        imagesSelect: imagesSelect
+      });
+      setStartDate(new Date(coupon.startDate));
+      setEndDate(new Date(coupon.endDate));
+    } else {
+      getCouponFromServer();
     }
-    setValues({
-      coupon: coupon,
-      couponExist: true,
-      imagesSelect: imagesSelect
-    });
-    setStartDate(new Date(coupon.startDate));
-    setEndDate(new Date(coupon.endDate));
+
   }, []);
 
   const classes = useStyles();
   const history = useHistory();
+
+  const getCouponFromServer = async () => {
+    try {
+      const id = +props.match.params.id;
+      const headers = {
+        'Id': id
+      }
+      let url = globals.urls.coupon;
+      const response = await axios.get(url, { headers });
+      const imagesSelect: boolean[] = [];
+      if (response.data.imagesNames) {
+        for (let i = 0; i < response.data.imagesNames.length; i++) {
+          imagesSelect[i] = false;
+        }
+      }
+      setValues({
+        coupon: response.data,
+        couponExist: true,
+        imagesSelect: imagesSelect
+      });
+      setStartDate(new Date(response.data.startDate));
+      setEndDate(new Date(response.data.endDate));
+    } catch (err) {
+      notify.error(err);
+    }
+  }
 
   async function send(coupon: CouponModel) {
     try {
@@ -193,90 +227,93 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
       {values.couponExist &&
         <Box component="span" m={1}>
           <form onSubmit={handleSubmit(send)}>
-
-            <Typography variant="h4" className="Headline"><PersonAddIcon />Update coupon</Typography>
-            <br />
-
-            <TextField defaultValue={values.coupon.title} label="Title" variant="outlined" type="text" name="title" inputRef={register({
-              required: { value: true, message: "Missing Title." },
-              minLength: { value: 3, message: "Title is too short" },
-              maxLength: { value: 50, message: "Title is too long" }
-            })} className={clsx(classes.margin, classes.textField)} />
-            <span className="error">{errors.title?.message}</span>
-            <br />
-
-            <TextField defaultValue={values.coupon.description} label="Description" variant="outlined" type="text" name="description" multiline rows={4} inputRef={register({
-              required: { value: true, message: "Missing Description." },
-              minLength: { value: 50, message: "Description is too short." }
-            })} className={clsx(classes.margin, classes.textField)} />
-            <span className="error">{errors.description?.message}</span>
-            <br />
-
-            <TextField defaultValue={values.coupon.startDate} label="Start Date" variant="outlined" type="Date" name="startDate" onChange={(event) => setStartDate(new Date(event.target.value))} inputRef={register({
-              required: { value: true, message: "Missing Start Date." },
-              min: { value: (new Date()).toString(), message: "Start Date is not valid." },
-              max: { value: endDate.toString(), message: "Start Date can't be after end date." }
-            })} className={clsx(classes.margin, classes.textField)} />
-            <span className="error">{errors.startDate?.message}</span>
-            <br />
-
-            <TextField defaultValue={values.coupon.endDate} label="End Date" variant="outlined" type="Date" name="endDate" onChange={(event) => setEndDate(new Date(event.target.value))} inputRef={register({
-              required: { value: true, message: "Missing End Date." },
-              min: { value: startDate.toString(), message: "End Date can't be before start date." }
-            })} className={clsx(classes.margin, classes.textField)} />
-            <span className="error">{errors.endDate?.message}</span>
-            <br />
-
-            <TextField defaultValue={values.coupon.price} label="Price" variant="outlined" type="number" name="price" inputRef={register({
-              required: { value: true, message: "Missing Price." },
-              min: { value: 1, message: "Price have to be above 1." },
-              max: { value: 100000, message: "Price have to be below 100000." }
-            })} className={clsx(classes.margin, classes.textField)} />
-            <span className="error">{errors.price?.message}</span>
-            <br />
-
-            <TextField defaultValue={values.coupon.amount} label="Amount" variant="outlined" type="number" name="amount" inputRef={register({
-              required: { value: true, message: "Missing Amount." },
-              min: { value: 1, message: "Amount have to be above 1." },
-              max: { value: 100000, message: "Amount have to be below 100000." }
-            })} className={clsx(classes.margin, classes.textField)} />
-            <span className="error">{errors.amount?.message}</span>
-            <br />
-
-            <FormControl className={classes.category}>
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={category}
-                name="category"
-                onChange={handleChangeCategory}
-              >
-                <MenuItem value={"Electricity"}>Electricity</MenuItem>
-                <MenuItem value={"Spa"}>Spa</MenuItem>
-                <MenuItem value={"Restaurant"}>Restaurant</MenuItem>
-                <MenuItem value={"Vacation"}>Vacation</MenuItem>
-                <MenuItem value={"Attractions"}>Attractions</MenuItem>
-                <MenuItem value={"Furniture"}>Furniture</MenuItem>
-              </Select>
-            </FormControl>
-            <br />
-            <br />
-            <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Choose images to delete</FormLabel>
+            <div className="FieldContainer">
+              <Typography variant="h4" className="Headline"><PersonAddIcon />Update coupon</Typography>
               <br />
-              <FormGroup row>
-                {values.coupon.imagesNames.map((imageName: string, index: number) =>
-                  <>
-                    <FormControlLabel key={index}
-                      control={<Checkbox indeterminate checked={values.imagesSelect[index]} onChange={handleChangeDelete} value={index} />}
-                      label={values.coupon.imagesNames[index]}
-                    />
+
+              <TextField defaultValue={values.coupon.title} label="Title" variant="outlined" type="text" name="title" className={clsx(classes.margin, classes.textField)} inputRef={register({
+                required: { value: true, message: "Missing Title." },
+                minLength: { value: 3, message: "Title is too short" },
+                maxLength: { value: 50, message: "Title is too long" }
+              })} />
+              <span className="error">{errors.title?.message}</span>
+              <br />
+
+              <TextField defaultValue={values.coupon.description} label="Description" variant="outlined" type="text" name="description" multiline rows={4} className={clsx(classes.margin, classes.textField)} inputRef={register({
+                required: { value: true, message: "Missing Description." },
+                minLength: { value: 50, message: "Description is too short." }
+              })} />
+              <span className="error"> {errors.description?.message}</span>
+              <br />
+
+              <TextField defaultValue={values.coupon.startDate} label="Start Date" variant="outlined" type="Date" name="startDate" onChange={(event) => setStartDate(new Date(event.target.value))} className={clsx(classes.margin, classes.textField)} inputRef={register({
+                required: { value: true, message: "Missing Start Date." },
+                min: { value: (new Date()).toString(), message: "Start Date is not valid." },
+                max: { value: endDate.toString(), message: "Start Date can't be after end date." }
+              })} />
+              <span className="error">{errors.startDate?.message}</span>
+              <br />
+
+              <TextField defaultValue={values.coupon.endDate} label="End Date" variant="outlined" type="Date" name="endDate" onChange={(event) => setEndDate(new Date(event.target.value))} className={clsx(classes.margin, classes.textField)} inputRef={register({
+                required: { value: true, message: "Missing End Date." },
+                min: { value: startDate.toString(), message: "End Date can't be before start date." }
+              })} />
+              <span className="error">{errors.endDate?.message}</span>
+              <br />
+
+              <TextField defaultValue={values.coupon.price} label="Price" variant="outlined" type="number" name="price" className={clsx(classes.margin, classes.textField)} inputRef={register({
+                required: { value: true, message: "Missing Price." },
+                min: { value: 1, message: "Price have to be above 1." },
+                max: { value: 100000, message: "Price have to be below 100000." }
+              })} />
+              <span className="error">{errors.price?.message}</span>
+              <br />
+
+              <TextField defaultValue={values.coupon.amount} label="Amount" variant="outlined" type="number" name="amount" className={clsx(classes.margin, classes.textField)} inputRef={register({
+                required: { value: true, message: "Missing Amount." },
+                min: { value: 1, message: "Amount have to be above 1." },
+                max: { value: 100000, message: "Amount have to be below 100000." }
+              })} />
+              <span className="error">{errors.amount?.message}</span>
+              <br />
+
+              <FormControl className={classes.category}>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={category}
+                  name="category"
+                  onChange={handleChangeCategory}
+                >
+                  <MenuItem value={"Electricity"}>Electricity</MenuItem>
+                  <MenuItem value={"Spa"}>Spa</MenuItem>
+                  <MenuItem value={"Restaurant"}>Restaurant</MenuItem>
+                  <MenuItem value={"Vacation"}>Vacation</MenuItem>
+                  <MenuItem value={"Attractions"}>Attractions</MenuItem>
+                  <MenuItem value={"Furniture"}>Furniture</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+            <br />
+            <br />
+            {values.coupon.imagesNames &&
+              <FormControl component="fieldset" className={classes.formControl}>
+                <FormLabel component="legend">Choose images to delete</FormLabel>
+                <br />
+                <FormGroup row>
+                  {values.coupon.imagesNames.map((imageName: string, index: number) =>
+                    <>
+                      <FormControlLabel key={index}
+                        control={<Checkbox indeterminate checked={values.imagesSelect[index]} onChange={handleChangeDelete} value={index} />}
+                        label={values.coupon.imagesNames[index]}
+                      />
                     &nbsp;
                     <img src={globals.urls.images + values.coupon.category + "/" + values.coupon.id + "/" + values.coupon.imagesNames[index]} width="150" height="150" />
                     &nbsp;&nbsp;&nbsp;
                   </>
-                )}
-              </FormGroup>
-            </FormControl>
+                  )}
+                </FormGroup>
+              </FormControl>
+            }
             <br />
             <br />
             <Button variant="contained" component="label">

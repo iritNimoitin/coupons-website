@@ -1,7 +1,10 @@
+import axios from "axios";
 import AdminModel from "../Models/AdminModel";
 import CompanyModel from "../Models/CompanyModel";
 import CouponModel from "../Models/CouponModel";
 import CustomerModel from "../Models/CustomerModel";
+import globals from "../Services/Globals";
+import store from "./Stores";
 
 export class AuthState {
     public user: CustomerModel | CompanyModel | AdminModel = null;
@@ -9,12 +12,24 @@ export class AuthState {
     public constructor() {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         const storedClientType = JSON.parse(localStorage.getItem("clientType"));
-        if (storedUser) {
-            this.user = storedUser;
+        if (storedUser && storedClientType) {
+            getNewToken(storedUser, storedClientType);
         }
-        if (storedClientType) {
-            this.clientType = storedClientType;
-        }
+    }
+}
+
+export async function getNewToken(user: CustomerModel | CompanyModel | AdminModel, clientType: string) {
+    try {
+        let url = globals.urls.auth.token;
+        const headers = {
+            "token": user.token,
+            "clientType": clientType
+        };
+        const response = await axios.get(url, { headers });
+        user.token = response.data;
+        store.dispatch(loginAction(user, clientType));
+    }
+    catch (err) {
     }
 }
 //--------------------------------------------------------

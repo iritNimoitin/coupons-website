@@ -29,10 +29,12 @@ class DevelopmentGlobals extends Globals {
         },
         auth: {
             register: "http://localhost:8080/Auth/register/",
-            login: "http://localhost:8080/Auth/login/"
+            login: "http://localhost:8080/Auth/login/",
+            token: "http://localhost:8080/Auth/token/"
         },
         images: "http://localhost:8080/pics/",
         coupons: "http://localhost:8080/App/coupons/",
+        coupon: "http://localhost:8080/App/coupons/one/"
     };
 
 }
@@ -62,10 +64,13 @@ class productionGlobal extends Globals {
         },
         auth: {
             register: "http://localhost:8080/Auth/register/",
-            login: "http://localhost:8080/Auth/login/"
+            login: "http://localhost:8080/Auth/login/",
+            token: "http://localhost:8080/Auth/token/"
+
         },
         images: "http://localhost:8080/pics/",
-        coupons: "http://localhost:8080/App/coupons/"
+        coupons: "http://localhost:8080/App/coupons/",
+        coupon: "http://localhost:8080/App/coupons/one/"
     };
 }
 const globals = process.env.NODE_ENV === "development" ? new DevelopmentGlobals() : new productionGlobal();

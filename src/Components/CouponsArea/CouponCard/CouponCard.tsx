@@ -28,6 +28,7 @@ import CompanyModel from '../../../Models/CompanyModel';
 import UpdateCoupon from '../../CompanyArea/UpdateCoupon/UpdateCoupon';
 import companyService from '../../../Services/CompanyService';
 import { FacebookShareButton, FacebookIcon, WhatsappShareButton, WhatsappIcon } from "react-share";
+import { Unsubscribe } from 'redux';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -61,9 +62,10 @@ interface CouponCardProps {
 export default function CouponCard(props: CouponCardProps) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
-  const [image, setImage] = React.useState();
+  const [image, setImage] = React.useState<string>(LogoImage);
   const [clientType, setClientType] = React.useState<String>(null);
   const [clientId, setClientId] = React.useState<number>(null);
+  let unsubscribeMe: Unsubscribe;
 
   const history = useHistory();
 
@@ -76,12 +78,16 @@ export default function CouponCard(props: CouponCardProps) {
     if (store.getState().AuthState.clientType === "Company") {
       setClientId((store.getState().AuthState.user as CompanyModel).id);
     }
-    store.subscribe(() => {
+    if (props.coupon.imagesNames) {
+      setImage(globals.urls.images + props.coupon.category + "/" + props.coupon.id + "/" + props.coupon.imagesNames[0]);
+    }
+    unsubscribeMe = store.subscribe(() => {
       setClientType(store.getState().AuthState.clientType);
       if (store.getState().AuthState.clientType === "Company") {
         setClientId((store.getState().AuthState.user as CompanyModel).id);
       }
     });
+    return () => unsubscribeMe();
   }, []);
 
   const handleDelete = () => {
@@ -107,7 +113,7 @@ export default function CouponCard(props: CouponCardProps) {
           id={props.coupon.id.toString()}
           className={classes.media}
           title={props.coupon.title}
-          image={globals.urls.images + props.coupon.category + "/" + props.coupon.id + "/" + props.coupon.imagesNames[0]}
+          image={image}
         />
       </NavLink>
       <CardContent>

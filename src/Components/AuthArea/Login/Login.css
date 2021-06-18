@@ -3,3 +3,8 @@
 	margin: 20px;
     padding: 20px;
 }
+
+.Login .error {
+	color: red;
+    margin: 0 20px;
+}

@@ -96,8 +96,8 @@ function Register(): JSX.Element {
         }
     }
 
-    const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValues({ ...values, [prop]: event.target.value });
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setValues({ ...values, password: event.target.value });
     };
 
     const handleClickShowPassword = () => {
@@ -113,7 +113,7 @@ function Register(): JSX.Element {
     };
 
     return (
-        <div className="Register">
+        <div className="Register Box">
             <Box component="span" m={1}>
                 <form onSubmit={handleSubmit(send)}>
 
@@ -133,8 +133,7 @@ function Register(): JSX.Element {
                             label="Password"
                             id="outlined-adornment-password"
                             type={values.showPassword ? 'text' : 'password'}
-                            value={values.password}
-                            onChange={handleChange('password')}
+                            onChange={handleChange}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">

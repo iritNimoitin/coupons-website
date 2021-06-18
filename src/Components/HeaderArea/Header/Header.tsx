@@ -1,12 +1,11 @@
 
+import Logo from "../Logo/Logo";
 import "./Header.css";
 
 function Header(): JSX.Element {
     return (
         <div className="Header">
-            <span>
-
-            </span>
+            <Logo />
         </div>
     );
 }

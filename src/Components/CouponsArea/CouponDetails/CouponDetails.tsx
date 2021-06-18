@@ -15,6 +15,7 @@ import { withRouter } from 'react-router-dom';
 import CustomerModel from "../../../Models/CustomerModel";
 import CompanyModel from "../../../Models/CompanyModel";
 import globals from "../../../Services/Globals";
+import axios from "axios";
 
 interface RouteParam {
     id: string;
@@ -60,14 +61,38 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
                     }
                 }
             }
-            const type = store.getState().AuthState.clientType;
-            this.setState({
-                coupon: coupon,
-                images: coupon.imagesNames,
-                clientType: type
-            });
+            if (coupon !== undefined) {
+                const type = store.getState().AuthState.clientType;
+                this.setState({
+                    coupon: coupon,
+                    images: coupon.imagesNames,
+                    clientType: type
+                });
+            } else {
+                this.getCouponFromServer();
+            }
+
         }
         catch (err) {
+            notify.error(err);
+        }
+    }
+
+    public getCouponFromServer = async () => {
+        try {
+            const id = +this.props.match.params.id;
+            const headers = {
+                'Id': id
+            }
+            let url = globals.urls.coupon;
+            const response = await axios.get(url, { headers });
+            const type = store.getState().AuthState.clientType;
+            this.setState({
+                coupon: response.data,
+                images: response.data.imagesNames,
+                clientType: type
+            });
+        } catch (err) {
             notify.error(err);
         }
     }
@@ -95,8 +120,8 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
                         <h3>Description: {this.state.coupon.description}</h3>
                         <div id="images">
                             <Carousel width={600}>
-                                {this.state.images.map(imageName =>
-                                    <div>
+                                {this.state.images?.map(imageName =>
+                                    <div key={imageName}>
                                         <img src={globals.urls.images + this.state.coupon.category + "/" + this.state.coupon.id + "/" + imageName} />
                                     </div>
                                 )}

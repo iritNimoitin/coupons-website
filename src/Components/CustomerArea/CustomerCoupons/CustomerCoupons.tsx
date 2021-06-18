@@ -2,13 +2,14 @@ import "./CustomerCoupons.css";
 import { Component } from "react";
 import { Unsubscribe } from "redux";
 import CouponModel from "../../../Models/CouponModel";
-import { userCouponsDownloadedAction } from "../../../Redux/AuthState";
+import { logoutAction, userCouponsDownloadedAction } from "../../../Redux/AuthState";
 import store, { getUserCategory } from "../../../Redux/Stores";
 import globals from "../../../Services/Globals";
 import jwtAxios from "../../../Services/jwtAxios";
 import notify from "../../../Services/Notification";
 import CouponCard from "../../CouponsArea/CouponCard/CouponCard";
 import CustomerModel from "../../../Models/CustomerModel";
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 interface CustomerCouponsState {
     coupons: CouponModel[];
@@ -16,9 +17,13 @@ interface CustomerCouponsState {
     maxPrice: number;
 }
 
-class CustomerCoupons extends Component<{}, CustomerCouponsState> {
+interface CustomerCouponsProps extends RouteComponentProps {
 
-    public constructor(props: {}) {
+}
+
+class CustomerCoupons extends Component<CustomerCouponsProps, CustomerCouponsState> {
+
+    public constructor(props: CustomerCouponsProps) {
         super(props);
         this.state = {
             coupons: [],
@@ -86,6 +91,8 @@ class CustomerCoupons extends Component<{}, CustomerCouponsState> {
             store.dispatch(userCouponsDownloadedAction(response.data, category));
         } catch (err) {
             notify.error(err);
+            store.dispatch(logoutAction());
+            this.props.history.push('/login');
         }
     }
 
@@ -98,4 +105,4 @@ class CustomerCoupons extends Component<{}, CustomerCouponsState> {
     }
 }
 
-export default CustomerCoupons;
+export default withRouter(CustomerCoupons);

@@ -9,6 +9,7 @@ import notify from "../../../Services/Notification";
 import CouponCard from "../CouponCard/CouponCard";
 import { RouteComponentProps, withRouter } from "react-router";
 import TablePagination from '@material-ui/core/TablePagination';
+import { Unsubscribe } from "redux";
 
 interface RouteParam {
     category: string;
@@ -41,8 +42,20 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
         };
     }
 
+    private unsubscribeMe: Unsubscribe;
+
+    public componentWillUnmount(): void {
+        this.unsubscribeMe();
+    }
+
     public componentDidMount() {
         this.getCoupons();
+        this.unsubscribeMe = store.subscribe(() => {
+            const category = this.props.match.params.category || "All";
+            if (this.state.totalElements !== getCategory(category).totalElements) {
+                this.getCoupons();
+            }
+        });
     }
 
     private getCoupons() {

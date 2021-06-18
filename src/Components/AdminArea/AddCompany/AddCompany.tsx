@@ -12,6 +12,7 @@ import { Send } from "@material-ui/icons";
 import CompanyModel from "../../../Models/CompanyModel";
 import jwtAxios from "../../../Services/jwtAxios";
 import { CompanyAddedAction } from "../../../Redux/AdminState";
+import { logoutAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

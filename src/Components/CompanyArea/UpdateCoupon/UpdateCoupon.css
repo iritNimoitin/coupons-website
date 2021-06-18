@@ -1,5 +1,11 @@
 .UpdateCoupon .error {
 	color: red;
     margin: 0 20px;
-    position: absolute;
+}
+
+.UpdateCoupon .FieldContainer {
+    display: inline-block;
+    text-align: center;
+    padding: 0 10px;
+    margin: 10px;
 }

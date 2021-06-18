@@ -20,7 +20,7 @@ import CouponModel from "../../../Models/CouponModel";
 import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { couponAddedAction } from "../../../Redux/CouponsState";
-import { userCouponAddedAction } from "../../../Redux/AuthState";
+import { logoutAction, userCouponAddedAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -53,7 +53,7 @@ function AddCoupon(props: {}): JSX.Element {
     const [startDate, setStartDate] = React.useState(new Date());
     const [endDate, setEndDate] = React.useState(new Date());
     const [imagesUploaded, setImagesUploaded] = React.useState<FileList>();
-    const [category, setCategory] = React.useState("");
+    const [category, setCategory] = React.useState("Spa");
     const classes = useStyles();
     const history = useHistory();
 
@@ -137,49 +137,49 @@ function AddCoupon(props: {}): JSX.Element {
                     <Typography variant="h4" className="Headline"><PersonAddIcon />Add coupon</Typography>
                     <br />
 
-                    <TextField label="Title" variant="outlined" type="text" name="title" inputRef={register({
+                    <TextField label="Title" variant="outlined" type="text" name="title" className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing Title." },
                         minLength: { value: 3, message: "Title is too short" },
                         maxLength: { value: 50, message: "Title is too long" }
-                    })} className={clsx(classes.margin, classes.textField)} />
+                    })} />
                     <span className="error">{errors.title?.message}</span>
                     <br />
 
-                    <TextField label="Description" variant="outlined" type="text" name="description" multiline rows={4} inputRef={register({
+                    <TextField label="Description" variant="outlined" type="text" name="description" multiline rows={4} className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing Description." },
                         minLength: { value: 50, message: "Description is too short." }
-                    })} className={clsx(classes.margin, classes.textField)} />
+                    })} />
                     <span className="error">{errors.description?.message}</span>
                     <br />
 
-                    <TextField defaultValue={new Date()} label="Start Date" variant="outlined" type="Date" name="startDate" onChange={(event) => setStartDate(new Date(event.target.value))} inputRef={register({
+                    <TextField defaultValue={new Date()} label="Start Date" variant="outlined" type="Date" name="startDate" onChange={(event) => setStartDate(new Date(event.target.value))} className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing Start Date." },
                         min: { value: (new Date()).toString(), message: "Start Date is not valid." },
                         max: { value: endDate.toString(), message: "Start Date can't be after end date." }
-                    })} className={clsx(classes.margin, classes.textField)} />
+                    })} />
                     <span className="error">{errors.startDate?.message}</span>
                     <br />
 
-                    <TextField defaultValue={new Date()} label="End Date" variant="outlined" type="Date" name="endDate" onChange={(event) => setEndDate(new Date(event.target.value))} inputRef={register({
+                    <TextField defaultValue={new Date()} label="End Date" variant="outlined" type="Date" name="endDate" onChange={(event) => setEndDate(new Date(event.target.value))} className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing End Date." },
                         min: { value: startDate.toString(), message: "End Date can't be before start date." }
-                    })} className={clsx(classes.margin, classes.textField)} />
+                    })} />
                     <span className="error">{errors.endDate?.message}</span>
                     <br />
 
-                    <TextField defaultValue={1} label="Price" variant="outlined" type="number" name="price" inputRef={register({
+                    <TextField defaultValue={1} label="Price" variant="outlined" type="number" name="price" className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing Price." },
                         min: { value: 1, message: "Price have to be above 1." },
                         max: { value: 100000, message: "Price have to be below 100000." }
-                    })} className={clsx(classes.margin, classes.textField)} />
+                    })} />
                     <span className="error">{errors.price?.message}</span>
                     <br />
 
-                    <TextField defaultValue={1} label="Amount" variant="outlined" type="number" name="amount" inputRef={register({
+                    <TextField defaultValue={1} label="Amount" variant="outlined" type="number" name="amount" className={clsx(classes.margin, classes.textField)} inputRef={register({
                         required: { value: true, message: "Missing Amount." },
                         min: { value: 1, message: "Amount have to be above 1." },
                         max: { value: 100000, message: "Amount have to be below 100000." }
-                    })} className={clsx(classes.margin, classes.textField)} />
+                    })} />
                     <span className="error">{errors.amount?.message}</span>
                     <br />
 
@@ -189,6 +189,9 @@ function AddCoupon(props: {}): JSX.Element {
                             value={category}
                             name="category"
                             onChange={handleChangeCategory}
+                            inputRef={register({
+                                required: { value: true, message: "Missing Category." }
+                            })}
                         >
                             <MenuItem value={"Electricity"}>Electricity</MenuItem>
                             <MenuItem value={"Spa"}>Spa</MenuItem>
@@ -198,16 +201,19 @@ function AddCoupon(props: {}): JSX.Element {
                             <MenuItem value={"Furniture"}>Furniture</MenuItem>
                         </Select>
                     </FormControl>
+                    <span className="error">{errors.category?.message}</span>
                     <br />
                     <br />
 
                     <Button variant="contained" component="label">
                         Upload images
-              <input type="file" name="imagesFiles" onChange={handleUploadChange} accept="image/*" ref={register()} multiple hidden />
+                        <input type="file" name="imagesFiles" onChange={handleUploadChange} accept="image/*" ref={register()} multiple hidden />
                     </Button>
                     <br />
                     <br />
-                    <Button type="submit" color="primary" variant="contained" className="button-login" startIcon={<Send />} >Add</Button>
+                    <Button type="submit" color="primary" variant="contained" className="button-login" startIcon={<Send />} >
+                        Add
+                    </Button>
                     <br />
                     <br />
                 </form>
@@ -216,9 +222,9 @@ function AddCoupon(props: {}): JSX.Element {
                     Array.from(imagesUploaded).forEach(image => {
                         <>
                             &nbsp;
-                <img src={URL.createObjectURL(image)} width="150" height="150" />
-                &nbsp;&nbsp;&nbsp;
-              </>
+                            <img src={URL.createObjectURL(image)} width="150" height="150" />
+                            &nbsp;&nbsp;&nbsp;
+                        </>
                     })
                 }
             </Box>

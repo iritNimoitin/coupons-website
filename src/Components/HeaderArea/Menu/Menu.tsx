@@ -3,7 +3,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import CategoryIcon from '@material-ui/icons/Category';
+import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import { NavLink } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -34,8 +34,8 @@ function SimpleMenu() {
 
   return (
     <div>
-      <Button className={classes.root} aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}><CategoryIcon />
-        Categories
+      <Button className={classes.root} aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}><MenuRoundedIcon />
+        &nbsp;Categories
       </Button>
       <Menu
         id="simple-menu"

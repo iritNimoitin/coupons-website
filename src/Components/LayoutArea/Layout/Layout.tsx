@@ -9,13 +9,15 @@ import "./Layout.css";
 
 function Layout(): JSX.Element {
     return (
-		<BrowserRouter>
+        <BrowserRouter>
             <div className='Layout'>
                 {/* <header>
                     <Toolbar></Toolbar>
                     <HideAppBar children = {<Header/>}/>
                 </header> */}
-                <HideAppBar children = {<Header/>}/>
+                <div className="bar">
+                    <HideAppBar children={<Header />} />
+                </div>
                 {/* <aside>
                 
                 </aside> */}
@@ -23,10 +25,10 @@ function Layout(): JSX.Element {
                 {/* <main>
                     <Routing/>
                 </main>
-
+*/}
                 <footer>
-                    <Footer/>
-                </footer> */}
+                    <Footer />
+                </footer>
             </div>
         </BrowserRouter>
     );

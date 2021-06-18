@@ -14,6 +14,7 @@ import CompanyModel from "../../../Models/CompanyModel";
 import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { CompanyUpdatedAction } from "../../../Redux/AdminState";
+import { logoutAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
