@@ -162,7 +162,8 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
         }
       });
       const headers = {
-        imagesToDelete: imagesToDelete
+        'imagesToDelete': imagesToDelete,
+        'oldCategory': values.coupon.category
       };
 
       const response = await jwtAxios.put(url, fromData, { headers });
