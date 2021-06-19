@@ -1,4 +1,3 @@
-import "./Logout.css";
 import { useEffect } from "react";
 import { useHistory } from "react-router";
 import { logoutAction } from "../../../Redux/AuthState";

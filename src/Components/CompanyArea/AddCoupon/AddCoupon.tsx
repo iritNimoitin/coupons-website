@@ -1,6 +1,6 @@
 import "./AddCoupon.css";
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from "react-hook-form";
 import MenuItem from '@material-ui/core/MenuItem';
 import { useHistory } from "react-router-dom";
@@ -10,17 +10,15 @@ import store, { getCategory, getUserCategory } from "../../../Redux/Stores";
 import globals from "../../../Services/Globals";
 import notify from "../../../Services/Notification";
 import clsx from 'clsx';
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, TextField, Typography } from "@material-ui/core";
+import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import FormLabel from '@material-ui/core/FormLabel';
 import CompanyModel from "../../../Models/CompanyModel";
 import CouponModel from "../../../Models/CouponModel";
-import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { couponAddedAction } from "../../../Redux/CouponsState";
-import { logoutAction, userCouponAddedAction } from "../../../Redux/AuthState";
+import { userCouponAddedAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -199,6 +197,7 @@ function AddCoupon(props: {}): JSX.Element {
                             <MenuItem value={"Vacation"}>Vacation</MenuItem>
                             <MenuItem value={"Attractions"}>Attractions</MenuItem>
                             <MenuItem value={"Furniture"}>Furniture</MenuItem>
+                            <MenuItem value={"Sport"}>Sport</MenuItem>
                         </Select>
                     </FormControl>
                     <span className="error">{errors.category?.message}</span>

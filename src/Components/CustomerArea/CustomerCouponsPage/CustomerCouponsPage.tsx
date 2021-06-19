@@ -1,4 +1,3 @@
-import "./CustomerCouponsPage.css";
 import React from "react";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -8,7 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import store from "../../../Redux/Stores";
 import { useHistory } from "react-router";
-import { Button, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import CustomerCoupons from "../CustomerCoupons/CustomerCoupons";
 import { ChangeCustomerCouponsCategoryAction, ChangeCustomerMaxPriceAction } from "../../../Redux/SharedState";
 
@@ -56,6 +55,7 @@ function CustomerCouponsPage(): JSX.Element {
                     <MenuItem value={"Vacation"}>Vacation</MenuItem>
                     <MenuItem value={"Attractions"}>Attractions</MenuItem>
                     <MenuItem value={"Furniture"}>Furniture</MenuItem>
+                    <MenuItem value={"Sport"}>Sport</MenuItem>
                 </Select>
                 <FormHelperText>Please choose a category</FormHelperText>
             </FormControl>

@@ -15,22 +15,18 @@ class Notify {
     private extractMessage(err: any): string {
 
         if (typeof err === "string") {
-            console.log("1");
             return err;
         }
 
-        if (typeof err?.response?.data === "string") {//beckend exact error
-            console.log("2");
+        if (typeof err?.response?.data === "string") {
             return err.response.data;
         }
 
-        if (Array.isArray(err?.response?.data)) { //beckend exact error
-            console.log("3");
+        if (Array.isArray(err?.response?.data)) {
             return err.response.data[0]
         }
-        //must be last
-        if (typeof err?.message === "string") {
-            console.log(err.response.data.message);
+
+        if (typeof err?.message === "string" && err.response?.data) {
             return err.response.data.message;
         }
 

@@ -45,7 +45,6 @@ function Routing(): JSX.Element {
                 <Route path="/admin/customers/update/:id" component={UpdateCustomer} exact />
                 <Redirect from="/" to="/home" exact />
                 <Route component={Page404} />
-                {/* must be last */}
 
             </Switch>
         </div>

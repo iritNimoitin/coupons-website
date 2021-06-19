@@ -1,14 +1,11 @@
-import AdminModel from "../Models/AdminModel";
 import CompanyModel from "../Models/CompanyModel";
-import CouponModel from "../Models/CouponModel";
 import CustomerModel from "../Models/CustomerModel";
 
 export class AdminState {
     public companies: CompanyModel[] = [];
     public customers: CustomerModel[] = [];
 }
-//--------------------------------------------------------
-//Admin action types:
+
 export enum AdminActionType {
     CompaniesDownloaded = "CompaniesDownloaded",
     CustomersDownloaded = "CustomersDownloaded",
@@ -19,14 +16,12 @@ export enum AdminActionType {
     CompanyDeleted = "CompanyDeleted",
     CustomerDeleted = "CustomerDeleted"
 }
-//---------------------------------------------------------
-//Shared Action:
+
 export interface AdminAction {
     type: AdminActionType;
     payload?: any;
 }
-//-------------------------------------------------------
-//action creators 
+
 export function CompaniesDownloadedAction(companies: CompanyModel[]): AdminAction {
     return { type: AdminActionType.CompaniesDownloaded, payload: companies };
 }
@@ -51,8 +46,7 @@ export function CompanyDeletedAction(companyId: number): AdminAction {
 export function CustomerDeletedAction(customerId: number): AdminAction {
     return { type: AdminActionType.CustomerDeleted, payload: customerId };
 }
-//----------------------------------------------------------
-//Shared reducer :
+
 export function AdminReducer(currentState: AdminState = new AdminState(), action: AdminAction): AdminState {
     const newState = { ...currentState };
 

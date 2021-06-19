@@ -1,4 +1,3 @@
-import "./AddCustomer.css";
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
@@ -10,9 +9,8 @@ import clsx from 'clsx';
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
 import jwtAxios from "../../../Services/jwtAxios";
-import { CompanyAddedAction, CustomerAddedAction } from "../../../Redux/AdminState";
+import { CustomerAddedAction } from "../../../Redux/AdminState";
 import CustomerModel from "../../../Models/CustomerModel";
-import { logoutAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

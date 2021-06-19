@@ -1,4 +1,3 @@
-import "./UpdateCustomer.css";
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form";
@@ -14,7 +13,6 @@ import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { CustomerUpdatedAction } from "../../../Redux/AdminState";
 import CustomerModel from "../../../Models/CustomerModel";
-import { logoutAction } from "../../../Redux/AuthState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

@@ -20,7 +20,8 @@ export default function getUserFromToken(token: string, clientType: string): Cus
           Restaurant: [],
           Vacation: [],
           Attractions: [],
-          Furniture: []
+          Furniture: [],
+          Sport: []
         },
         token: token
       };
@@ -37,7 +38,8 @@ export default function getUserFromToken(token: string, clientType: string): Cus
           Restaurant: [],
           Vacation: [],
           Attractions: [],
-          Furniture: []
+          Furniture: [],
+          Sport: []
         },
         token: token
       };

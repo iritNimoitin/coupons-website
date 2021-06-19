@@ -32,8 +32,7 @@ export async function getNewToken(user: CustomerModel | CompanyModel | AdminMode
     catch (err) {
     }
 }
-//--------------------------------------------------------
-//Auth action types:
+
 export enum AuthActionType {
     Register = "Register",
     Login = "Login",
@@ -43,16 +42,14 @@ export enum AuthActionType {
     UserCouponUpdated = "UserCouponUpdated",
     UserCouponDeleted = "UserCouponDeleted"
 }
-//---------------------------------------------------------
-//Auth Action:
+
 export interface AuthAction {
     type: AuthActionType;
     payload?: any;
     clientType?: string;
     category?: string;
 }
-//-------------------------------------------------------
-//action creators 
+
 export function registerAction(user: CustomerModel | CompanyModel, clientType: string): AuthAction {
     return { type: AuthActionType.Register, payload: user, clientType: clientType };
 }
@@ -74,8 +71,7 @@ export function userCouponUpdatedAction(coupon: CouponModel, category: string): 
 export function userCouponDeletedAction(coupon: CouponModel, category: string): AuthAction {
     return { type: AuthActionType.UserCouponDeleted, payload: coupon, category: category };
 }
-//----------------------------------------------------------
-//Auth reducer :
+
 export function AuthReducer(currentState: AuthState = new AuthState(), action: AuthAction): AuthState {
     const newState = { ...currentState };
 
@@ -84,9 +80,8 @@ export function AuthReducer(currentState: AuthState = new AuthState(), action: A
         case AuthActionType.Login:
             newState.user = action.payload;
             newState.clientType = action.clientType;
-            localStorage.setItem("user", JSON.stringify(newState.user)); //saving in the local storage - wont be deleted
+            localStorage.setItem("user", JSON.stringify(newState.user));
             localStorage.setItem("clientType", JSON.stringify(newState.clientType));
-            //sessionStorage.setItem("user" ,JSON.stringify(newState.user)); //saving in the session storage - will be deleted
             break;
         case AuthActionType.Logout:
             newState.user = null;
@@ -150,6 +145,10 @@ function switchCategory(state: AuthState, category: string, target: CouponModel[
         case "Furniture":
             (state.user as CustomerModel | CompanyModel).coupons.Furniture =
                 fun((state.user as CustomerModel | CompanyModel).coupons.Furniture, target);
+            break;
+        case "Sport":
+            (state.user as CustomerModel | CompanyModel).coupons.Sport =
+                fun((state.user as CustomerModel | CompanyModel).coupons.Sport, target);
             break;
         case "All":
             (state.user as CustomerModel | CompanyModel).coupons.All =

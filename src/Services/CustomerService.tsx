@@ -1,6 +1,7 @@
 import CouponModel from "../Models/CouponModel";
 import CustomerModel from "../Models/CustomerModel";
 import { userCouponAddedAction } from "../Redux/AuthState";
+import { couponPurchasedAction } from "../Redux/CouponsState";
 import store from "../Redux/Stores";
 import globals from "./Globals";
 import jwtAxios from "./jwtAxios";
@@ -8,14 +9,7 @@ import notify from "./Notification";
 
 class CustomerService {
 
-  //private check if logged
-  // if(store.getState().AuthState.user && store.getState().AuthState.clientType === "Customer"){
-  //     purchaseCoupon();
-  //   } else{
-  //     notify.error("Please log in as customer for purchasing coupons.");
-  //   }
-
-  public async purchaseCoupon(coupon: CouponModel) {
+  public async purchaseCoupon(coupon: CouponModel, customer: CustomerModel) {
     try {
       const headers = {
         'couponId': coupon.id,
@@ -24,6 +18,8 @@ class CustomerService {
       const user = (store.getState().AuthState.user as CustomerModel);
       store.dispatch(userCouponAddedAction(coupon, "All"));
       store.dispatch(userCouponAddedAction(coupon, coupon.category));
+      store.dispatch(couponPurchasedAction(coupon, customer, coupon.category));
+      store.dispatch(couponPurchasedAction(coupon, customer, "All"));
       notify.success("You have been successfully purchasing the coupon.");
     }
     catch (err) {

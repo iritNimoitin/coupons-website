@@ -25,7 +25,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import axios from "axios";
 import { couponsDownloadedAction } from "../../../Redux/CouponsState";
-import { logoutAction } from "../../../Redux/AuthState";
+import { Unsubscribe } from "redux";
 
 const useStyles = makeStyles({
     table: {
@@ -42,22 +42,24 @@ function Customers(): JSX.Element {
 
     const [customers, setCustomers] = React.useState<CustomerModel[]>([]);
     const history = useHistory();
+    let unsubscribeMe: Unsubscribe;
 
     useEffect(() => {
         getCustomers();
         if (store.getState().CouponsState.category.All.coupons.length === 0) {
             getCouponsFromServer();
         }
-        store.subscribe(() => {
+        unsubscribeMe = store.subscribe(() => {
             if (store.getState().AdminState.customers.length !== customers.length) {
                 setCustomers(store.getState().AdminState.customers);
             }
         });
+        return () => unsubscribeMe();
     }, []);
 
     const getCustomers = () => {
         const temp = store.getState().AdminState.customers;
-        if (temp.length === 0) {
+        if (!temp || temp.length === 0) {
             getCustomersFromServer();
         } else {
             setCustomers(temp);
@@ -72,23 +74,18 @@ function Customers(): JSX.Element {
             store.dispatch(CustomersDownloadedAction(response.data));
         } catch (err) {
             notify.error(err);
-            store.dispatch(logoutAction());
-            history.push("/login");
+            history.push("/home");
         }
     }
 
     const getCouponsFromServer = async () => {
         try {
-            const headers = {
-                'sortBy': 'id',
-            }
             let url = globals.urls.coupons;
-            const response = await axios.get(url, { headers });
+            const response = await axios.get(url);
             store.dispatch(couponsDownloadedAction(response.data, "All", Math.round(response.data.length / 8), response.data.length));
         } catch (err) {
             notify.error(err);
-            store.dispatch(logoutAction());
-            history.push("/login");
+            history.push("/home");
         }
     }
 
@@ -131,11 +128,13 @@ function Customers(): JSX.Element {
                             Delete
                         </Button>
                     </TableCell>
-                    <TableCell align="center">
-                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                        </IconButton>
-                    </TableCell>
+                    {store.getState().CouponsState.category.All.coupons.filter((coupon) => coupon.customers.find(customer => customer.id === row.id) !== undefined).length > 0 &&
+                        <TableCell align="center">
+                            <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            </IconButton>
+                        </TableCell>
+                    }
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>

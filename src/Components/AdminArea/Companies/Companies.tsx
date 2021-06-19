@@ -25,7 +25,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { couponsDownloadedAction } from "../../../Redux/CouponsState";
 import axios from "axios";
-import { logoutAction } from "../../../Redux/AuthState";
+import { Unsubscribe } from "redux";
 
 const useStyles = makeStyles({
     table: {
@@ -42,22 +42,24 @@ function Companies(): JSX.Element {
 
     const [companies, setCompanies] = React.useState<CompanyModel[]>([]);
     const history = useHistory();
+    let unsubscribeMe: Unsubscribe;
 
     useEffect(() => {
         getCompanies();
         if (store.getState().CouponsState.category.All.coupons.length === 0) {
             getCouponsFromServer();
         }
-        store.subscribe(() => {
+        unsubscribeMe = store.subscribe(() => {
             if (store.getState().AdminState.companies.length !== companies.length) {
                 setCompanies(store.getState().AdminState.companies);
             }
         });
+        return () => unsubscribeMe();
     }, []);
 
     const getCompanies = () => {
         const temp = store.getState().AdminState.companies;
-        if (temp.length === 0) {
+        if (!temp || temp.length === 0) {
             getCompaniesFromServer();
         } else {
             setCompanies(temp);
@@ -72,23 +74,18 @@ function Companies(): JSX.Element {
             store.dispatch(CompaniesDownloadedAction(response.data));
         } catch (err) {
             notify.error(err);
-            store.dispatch(logoutAction());
-            history.push("/login");
+            history.push("/home");
         }
     }
 
     const getCouponsFromServer = async () => {
         try {
-            const headers = {
-                'sortBy': 'id',
-            }
             let url = globals.urls.coupons;
-            const response = await axios.get(url, { headers });
+            const response = await axios.get(url);
             store.dispatch(couponsDownloadedAction(response.data, "All", Math.round(response.data.length / 8), response.data.length));
         } catch (err) {
             notify.error(err);
-            store.dispatch(logoutAction());
-            history.push("/login");
+            history.push("/home");
         }
     }
 
@@ -130,12 +127,15 @@ function Companies(): JSX.Element {
                             Delete
                         </Button>
                     </TableCell>
-                    <TableCell align="center">
-                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                        </IconButton>
-                    </TableCell>
+                    {store.getState().CouponsState.category.All.coupons.filter((coupon) => coupon.company.id === row.id).length > 0 &&
+                        <TableCell align="center">
+                            <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            </IconButton>
+                        </TableCell>
+                    }
                 </TableRow>
+
                 <TableRow>
                     <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
                         <Collapse in={open} timeout="auto" unmountOnExit>

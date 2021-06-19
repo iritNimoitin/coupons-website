@@ -7,25 +7,18 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import CouponModel from '../../../Models/CouponModel';
 import LogoImage from "../../../Assests/Images/Coupons_logo.png";
 import { Chip } from '@material-ui/core';
 import { NavLink, useHistory } from 'react-router-dom';
 import globals from '../../../Services/Globals';
 import Button from '@material-ui/core/Button';
-import axios from 'axios';
-import notify from '../../../Services/Notification';
 import store from '../../../Redux/Stores';
 import CompanyModel from '../../../Models/CompanyModel';
-import UpdateCoupon from '../../CompanyArea/UpdateCoupon/UpdateCoupon';
 import companyService from '../../../Services/CompanyService';
 import { FacebookShareButton, FacebookIcon, WhatsappShareButton, WhatsappIcon } from "react-share";
 import { Unsubscribe } from 'redux';
@@ -63,7 +56,6 @@ export default function CouponCard(props: CouponCardProps) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const [image, setImage] = React.useState<string>(LogoImage);
-  const [clientType, setClientType] = React.useState<String>(null);
   const [clientId, setClientId] = React.useState<number>(null);
   let unsubscribeMe: Unsubscribe;
 
@@ -74,7 +66,6 @@ export default function CouponCard(props: CouponCardProps) {
   };
 
   useEffect(() => {
-    setClientType(store.getState().AuthState.clientType);
     if (store.getState().AuthState.clientType === "Company") {
       setClientId((store.getState().AuthState.user as CompanyModel).id);
     }
@@ -82,7 +73,6 @@ export default function CouponCard(props: CouponCardProps) {
       setImage(globals.urls.images + props.coupon.category + "/" + props.coupon.id + "/" + props.coupon.imagesNames[0]);
     }
     unsubscribeMe = store.subscribe(() => {
-      setClientType(store.getState().AuthState.clientType);
       if (store.getState().AuthState.clientType === "Company") {
         setClientId((store.getState().AuthState.user as CompanyModel).id);
       }
@@ -125,13 +115,6 @@ export default function CouponCard(props: CouponCardProps) {
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        {clientType === "Customer" &&
-          <>
-            <IconButton aria-label="add to favorites">
-              <FavoriteIcon color="secondary" />
-            </IconButton>
-          </>
-        }
         &nbsp;
         <FacebookShareButton
           url={"https://github.com/iritNimoitin"}

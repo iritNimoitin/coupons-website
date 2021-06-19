@@ -1,5 +1,4 @@
 import { CouponCategories } from "../Redux/CouponsState";
-import CouponModel from "./CouponModel";
 
 class CompanyModel {
     public id: number;

@@ -9,8 +9,6 @@ import notify from "./Notification";
 
 class CompanyService {
 
-    //private check if logged
-
     public async deleteCoupon(coupon: CouponModel) {
         try {
             const headers = {

@@ -16,6 +16,7 @@ import CustomerModel from "../../../Models/CustomerModel";
 import CompanyModel from "../../../Models/CompanyModel";
 import globals from "../../../Services/Globals";
 import axios from "axios";
+import companyService from "../../../Services/CompanyService";
 
 interface RouteParam {
     id: string;
@@ -98,11 +99,16 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
     }
 
     public handlePurchase = () => {
-        customerService.purchaseCoupon(this.state.coupon);
+        customerService.purchaseCoupon(this.state.coupon, (store.getState().AuthState.user as CustomerModel));
     }
 
-    public handleBack = () => {
+    public handleDelete = () => {
+        companyService.deleteCoupon(this.state.coupon);
+    }
 
+    public handleUpdate = () => {
+        let path = `/company/update/${this.state.coupon.category}/${this.state.coupon.id}`;
+        this.props.history.push(path);
     }
 
     public render(): JSX.Element {
@@ -127,7 +133,7 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
                                 )}
                             </Carousel>
                         </div>
-                        {store.getState().AuthState.user && this.state.clientType === "Customer" &&
+                        {store.getState().AuthState.user && this.state.clientType === "Customer" ?
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -137,6 +143,18 @@ class CouponDetails extends Component<CouponDetailsProps, CouponDetailsState> {
                             >
                                 Buy Now
                             </Button>
+                            :
+                            store.getState().AuthState.user && this.state.clientType === "Company" ?
+                                <>
+                                    <Button variant="contained" color="primary" size="large" onClick={this.handleUpdate}>
+                                        Update
+                                </Button>
+                                &nbsp;
+                                    <Button variant="contained" color="secondary" size="large" onClick={this.handleDelete}>
+                                        Delete
+                                </Button>
+                                </>
+                                : null
                         }
                         <br /> <br />
                         <Button

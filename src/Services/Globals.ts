@@ -1,9 +1,7 @@
-
-//global settings which are same for developmnt and production
 class Globals {
 
 }
-//global settings which are suitable only for development 
+
 class DevelopmentGlobals extends Globals {
     public urls = {
         admin: {
@@ -38,7 +36,7 @@ class DevelopmentGlobals extends Globals {
     };
 
 }
-//global setting which are suitable only for production 
+
 class productionGlobal extends Globals {
     public urls = {
         admin: {

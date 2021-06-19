@@ -77,7 +77,7 @@ class CouponsList extends Component<CouponListProps, CouponsListState> {
         try {
             let category = this.props.match.params.category || "";
             const headers = {
-                'sortBy': 'price',
+                'sortBy': 'id',
                 'category': category
             }
             let url = globals.urls.coupons;

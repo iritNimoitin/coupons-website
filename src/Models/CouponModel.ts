@@ -5,7 +5,7 @@ class CouponModel {
     public id: number;
     public company: CompanyModel;
     public companyId: number;
-    public category: string;//enum
+    public category: string;
     public title: string;
     public description: string;
     public startDate: Date;

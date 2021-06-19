@@ -20,7 +20,7 @@ import CouponModel from "../../../Models/CouponModel";
 import { RouteComponentProps } from "react-router";
 import jwtAxios from "../../../Services/jwtAxios";
 import { couponUpdatedAction } from "../../../Redux/CouponsState";
-import { logoutAction, userCouponUpdatedAction } from "../../../Redux/AuthState";
+import { userCouponUpdatedAction } from "../../../Redux/AuthState";
 import axios from "axios";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -291,6 +291,7 @@ function UpdateCoupon(props: UpdateCouponProps): JSX.Element {
                   <MenuItem value={"Vacation"}>Vacation</MenuItem>
                   <MenuItem value={"Attractions"}>Attractions</MenuItem>
                   <MenuItem value={"Furniture"}>Furniture</MenuItem>
+                  <MenuItem value={"Sport"}>Sport</MenuItem>
                 </Select>
               </FormControl>
             </div>

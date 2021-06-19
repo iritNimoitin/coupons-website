@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function CompanyCouponsPage(): JSX.Element {
   const [category, setCategory] = React.useState<string>("All");
-  // const [maxPrice, setMaxPrice] = React.useState<number>();
   const classes = useStyles();
   const history = useHistory();
 
@@ -67,6 +66,7 @@ function CompanyCouponsPage(): JSX.Element {
           <MenuItem value={"Vacation"}>Vacation</MenuItem>
           <MenuItem value={"Attractions"}>Attractions</MenuItem>
           <MenuItem value={"Furniture"}>Furniture</MenuItem>
+          <MenuItem value={"Sport"}>Sport</MenuItem>
         </Select>
         <FormHelperText>Please choose a category</FormHelperText>
       </FormControl>

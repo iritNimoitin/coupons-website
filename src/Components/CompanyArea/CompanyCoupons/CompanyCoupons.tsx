@@ -2,7 +2,7 @@ import { Component } from "react";
 import { Unsubscribe } from "redux";
 import CompanyModel from "../../../Models/CompanyModel";
 import CouponModel from "../../../Models/CouponModel";
-import { logoutAction, userCouponsDownloadedAction } from "../../../Redux/AuthState";
+import { userCouponsDownloadedAction } from "../../../Redux/AuthState";
 import store, { getUserCategory } from "../../../Redux/Stores";
 import globals from "../../../Services/Globals";
 import jwtAxios from "../../../Services/jwtAxios";
@@ -47,27 +47,32 @@ class CompanyCoupons extends Component<CompanyCouponsProps, CompanyCouponsState>
                     category: category
                 });
                 this.getCoupons();
-            } else if (getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).length !== this.state.coupons.length) {
-                this.setState({
-                    ...this.state,
-                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
-                })
-            }
-            if (!store.getState().SharedState.companyMaxPrice) {
-                this.setState({
-                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
-                })
-            } else if (this.state.maxPrice !== store.getState().SharedState.companyMaxPrice) {
-                this.setState({
-                    coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).filter(coupon => coupon.price < store.getState().SharedState.companyMaxPrice)
-                })
+            } else if (store.getState().AuthState.user) {
+                if (getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).length !== this.state.coupons.length) {
+                    this.setState({
+                        ...this.state,
+                        coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
+                    })
+                }
+                if (!store.getState().SharedState.companyMaxPrice) {
+                    this.setState({
+                        coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel))
+                    })
+                } else if (this.state.maxPrice !== store.getState().SharedState.companyMaxPrice) {
+                    this.setState({
+                        coupons: getUserCategory(category, (store.getState().AuthState.user as CompanyModel)).filter(coupon => coupon.price < store.getState().SharedState.companyMaxPrice)
+                    })
+                }
             }
         });
     }
 
     private getCoupons() {
-        const userCoupons = getUserCategory(store.getState().SharedState.companyCouponsCategory, (store.getState().AuthState.user as CompanyModel));
-        if (userCoupons.length === 0) {
+        let userCoupons: CouponModel[];
+        if (store.getState().AuthState.user !== null) {
+            userCoupons = getUserCategory(store.getState().SharedState.companyCouponsCategory, (store.getState().AuthState.user as CompanyModel));
+        }
+        if (!userCoupons || userCoupons.length === 0) {
             this.getCouponsFromServer();
         } else {
             this.setState({ coupons: userCoupons });
@@ -91,8 +96,7 @@ class CompanyCoupons extends Component<CompanyCouponsProps, CompanyCouponsState>
             store.dispatch(userCouponsDownloadedAction(response.data, category));
         } catch (err) {
             notify.error(err);
-            store.dispatch(logoutAction());
-            this.props.history.push('/login');
+            this.props.history.push('/home');
         }
     }
 
