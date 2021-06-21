@@ -161,8 +161,10 @@ export function couponsReducer(currentState: CouponsState = new CouponsState(), 
             break;
         case CouponsActionType.CouponPurchased:
             const categoryP = action.category;
-            action.payload.customers.push(action.customer);
-            console.log(action.payload);
+            if (!(action.payload as CouponModel).customers && action.category === "All") {
+                (action.payload as CouponModel).customers = [];
+            }
+            (action.payload as CouponModel).customers.push(action.customer);
             switchCategory(newState, categoryP, (source: CouponSet, couponPurchased: CouponModel[]) => {
                 source.coupons = source.coupons.filter(coupon => coupon.id !== couponPurchased[0].id);
                 source.coupons.push(couponPurchased[0]);

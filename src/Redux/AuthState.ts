@@ -91,7 +91,8 @@ export function AuthReducer(currentState: AuthState = new AuthState(), action: A
             break;
         case AuthActionType.UserCouponsDownloaded:
             switchCategory(newState, action.category, action.payload, (source: CouponModel[], couponsDownloaded: CouponModel[]) => {
-                return couponsDownloaded;
+                source = source.concat(couponsDownloaded);
+                return source;
             });
             break;
         case AuthActionType.UserCouponAdded:

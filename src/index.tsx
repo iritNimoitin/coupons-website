@@ -5,9 +5,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-  <React.StrictMode>/*make problem */
-    <Layout />
-  </React.StrictMode>,
+  <Layout />,
   document.getElementById('root')
 );
 

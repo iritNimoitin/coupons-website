@@ -15,11 +15,10 @@ class CustomerService {
         'couponId': coupon.id,
       }
       await jwtAxios.put(globals.urls.customer.coupons, null, { headers });
-      const user = (store.getState().AuthState.user as CustomerModel);
       store.dispatch(userCouponAddedAction(coupon, "All"));
       store.dispatch(userCouponAddedAction(coupon, coupon.category));
-      store.dispatch(couponPurchasedAction(coupon, customer, coupon.category));
       store.dispatch(couponPurchasedAction(coupon, customer, "All"));
+      store.dispatch(couponPurchasedAction(coupon, customer, coupon.category));
       notify.success("You have been successfully purchasing the coupon.");
     }
     catch (err) {
