@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import Layout from './Components/LayoutArea/Layout/Layout';
 import './index.css';
